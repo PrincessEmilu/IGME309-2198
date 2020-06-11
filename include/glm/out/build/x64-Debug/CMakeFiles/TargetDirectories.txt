@@ -1,0 +1,3 @@
+D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/glm_dummy.dir
+D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
