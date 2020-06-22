@@ -25,10 +25,26 @@ void Application::Display(void)
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 
+	/* Euler- Will Cause gimble lock!
 	m_m4Model = glm::rotate(IDENTITY_M4, glm::radians(m_v3Rotation.x), vector3(1.0f, 0.0f, 0.0f));
 	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.y), vector3(0.0f, 1.0f, 0.0f));
 	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.z), vector3(0.0f, 0.0f, 1.0f));
 	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_m4Model));
+	*/
+
+	// Let's use quaternions instead!
+	glm::quat x_quat = glm::angleAxis(glm::radians(m_v3Rotation.x), AXIS_X);
+	glm::quat y_quat = glm::angleAxis(glm::radians(m_v3Rotation.y), AXIS_Y);
+	glm::quat z_quat = glm::angleAxis(glm::radians(m_v3Rotation.z), AXIS_Z);
+
+	// "Add" the quaternions together, from the previous position
+	m_qOrientation *= (x_quat * y_quat * z_quat);
+
+	// Render call- using our new orientation instead
+	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qOrientation));
+
+	// Reset the rotation
+	m_v3Rotation = vector3(0, 0, 0);
 
 	//m_qOrientation = m_qOrientation * glm::angleAxis(glm::radians(1.0f), vector3(1.0f));
 	//m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qOrientation));
