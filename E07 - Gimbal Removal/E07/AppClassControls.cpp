@@ -1,5 +1,4 @@
 #include "AppClass.h"
-using namespace Simplex;
 //Mouse
 void Application::ProcessMouseMovement(sf::Event a_event)
 {
@@ -63,6 +62,7 @@ void Application::ProcessMouseScroll(sf::Event a_event)
 
 	if (fMultiplier)
 		fSpeed *= 2.0f;
+	m_pCameraMngr->MoveForward(-fSpeed);
 }
 //Keyboard
 void Application::ProcessKeyPressed(sf::Event a_event)
@@ -89,12 +89,20 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		m_bRunning = false;
 		break;
 	case sf::Keyboard::F1:
-		m_pCamera->SetPerspective();
-		m_pCamera->CalculateProjectionMatrix();
+		m_pCameraMngr->SetCameraMode(CAM_PERSP);
 		break;
 	case sf::Keyboard::F2:
-		m_pCamera->SetPerspective(false);
-		m_pCamera->CalculateProjectionMatrix();
+		m_pCameraMngr->SetCameraMode(CAM_ORTHO_Z);
+		break;
+	case sf::Keyboard::F3:
+		m_pCameraMngr->SetCameraMode(CAM_ORTHO_Y);
+		break;
+	case sf::Keyboard::F4:
+		m_pCameraMngr->SetCameraMode(CAM_ORTHO_X);
+		break;
+	case sf::Keyboard::F:
+		bFPSControl = !bFPSControl;
+		m_pCameraMngr->SetFPS(bFPSControl);
 		break;
 	case sf::Keyboard::Add:
 		++m_uActCont;
@@ -327,9 +335,6 @@ void Application::ArcBall(float a_fSensitivity)
 }
 void Application::CameraRotation(float a_fSpeed)
 {
-	// Speed up the roation because it's ungodly slow
-	a_fSpeed *= 5;
-
 	if (m_bFPC == false)
 		return;
 
@@ -350,7 +355,6 @@ void Application::CameraRotation(float a_fSpeed)
 	float fAngleX = 0.0f;
 	float fAngleY = 0.0f;
 	float fDeltaMouse = 0.0f;
-
 	if (MouseX < CenterX)
 	{
 		fDeltaMouse = static_cast<float>(CenterX - MouseX);
@@ -372,35 +376,9 @@ void Application::CameraRotation(float a_fSpeed)
 		fDeltaMouse = static_cast<float>(MouseY - CenterY);
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
-
-	// Avoiding gimble lock - Can't lock if you can't get to 90 degrees ;)
-	if (fAngleX > 89)
-		fAngleX = 89;
-
-	if (fAngleY > 89)
-		fAngleY = 89;
-
-	// Get the x and y quaternions from our calculated mouse angle
-	quaternion rotationX = glm::angleAxis(glm::radians(fAngleX), AXIS_X);
-	quaternion rotationY = glm::angleAxis(glm::radians(fAngleY), AXIS_Y);
-
-	// Z Axis, take both x and y
-	vector3 rotationF = m_pCamera->GetForward() * rotationX * rotationY;
-
-	// Already on the x axis, just take the y
-	vector3 rotationS = m_pCamera->GetRight() * rotationY;
-
-	// Actually set the values we calculated
-	m_pCamera->SetForward(rotationF);
-	m_pCamera->SetRight(rotationS);
-
-	vector3 newTarget = m_pCamera->GetPosition() + m_pCamera->GetForward();
-
-	m_pCamera->SetTarget(newTarget);
-
 	//Change the Yaw and the Pitch of the camera
-
-	
+	m_pCameraMngr->ChangeYaw(fAngleY * 3.0f);
+	m_pCameraMngr->ChangePitch(-fAngleX * 3.0f);
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard
@@ -411,40 +389,56 @@ void Application::ProcessKeyboard(void)
 	for discreet on/off use ProcessKeyboardPressed/Released
 	*/
 #pragma region Camera Position
-	float fSpeed = 0.1f;
+	float fSpeed = 1.0f;
 	float fMultiplier = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
 
 	if (fMultiplier)
 		fSpeed *= 5.0f;
 
-	// Move forward
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		m_pCamera->MoveForward(-fSpeed);
+		m_pCameraMngr->MoveForward(fSpeed);
 
-	// Move backward
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		m_pCamera->MoveForward(fSpeed);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		m_pCameraMngr->MoveForward(-fSpeed);
 
-	// Move left
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		m_pCamera->MoveSideways(-fSpeed);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		m_pCameraMngr->MoveSideways(-fSpeed);
 
-	// Move right
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		m_pCamera->MoveSideways(fSpeed);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		m_pCameraMngr->MoveSideways(fSpeed);
 
-	// Move up
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-		m_pCamera->MoveVertical(fSpeed);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+		m_pCameraMngr->MoveVertical(-fSpeed);
 
-	// Move down
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-		m_pCamera->MoveVertical(-fSpeed);
-
-
-
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+		m_pCameraMngr->MoveVertical(fSpeed);
 #pragma endregion
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+	{
+		if (fMultiplier)
+			m_v3Rotation.x -= 1.0f;
+		else
+			m_v3Rotation.x += 1.0f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+	{
+		if (fMultiplier)
+			m_v3Rotation.y -= 1.0f;
+		else
+			m_v3Rotation.y += 1.0f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+	{
+		if (fMultiplier)
+			m_v3Rotation.z -= 1.0f;
+		else
+			m_v3Rotation.z += 1.0f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+	{
+		m_v3Rotation = vector3(0.0f);
+	}
 }
 //Joystick
 void Application::ProcessJoystick(void)
