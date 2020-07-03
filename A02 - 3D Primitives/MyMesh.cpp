@@ -490,9 +490,65 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	// LETS MAKE THAT SPHERE
+	float positionX;
+	float positionY;
+	float positionZ;
+
+	float horizontalAngle; // X angle
+	float verticalAngle; // Z Angle
+
+	float xyCalculation;
+
+	std::vector<vector3> verticesVector;
+
+	// This outer loop sets up our current "stack"
+	for (uint i = 0; i <= a_nSubdivisions; i++)
+	{
+		verticalAngle = (PI / 2) - (i * (PI / a_nSubdivisions));
+
+		xyCalculation = a_fRadius * cosf(verticalAngle);
+		positionZ = a_fRadius * sinf(verticalAngle);
+
+		// The inner creates the individual sectors
+		for (uint j = 0; j <= a_nSubdivisions; j++)
+		{
+			horizontalAngle = j * ((2 * PI) / a_nSubdivisions);
+
+			positionX = xyCalculation * cosf(horizontalAngle);
+			positionY = xyCalculation * sinf(horizontalAngle);
+
+			verticesVector.push_back(vector3(positionX, positionY, positionZ));
+		}
+	}
+
+	// Actually draw our vertices
+	int xIndex;
+	int yIndex;
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		// Define where the points are in our vertices vector
+		xIndex = i * (a_nSubdivisions + 1);
+		yIndex = xIndex + (a_nSubdivisions + 1);
+
+		for (uint j = 0; j < a_nSubdivisions; j++)
+		{
+			if (i != 0)
+				AddTri(verticesVector[yIndex], verticesVector[xIndex], verticesVector[xIndex + 1]);
+
+			if (i != (a_nSubdivisions - 1))
+				AddTri(verticesVector[yIndex], verticesVector[xIndex + 1], verticesVector[yIndex + 1]);
+
+			// Iterate to the next index
+			xIndex++;
+			yIndex++;
+		}
+	}
+
+
+
+
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
