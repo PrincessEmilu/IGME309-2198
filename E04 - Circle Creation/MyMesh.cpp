@@ -17,15 +17,42 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		then call the AddTri function to generate a_nSubdivision number of faces
 	*/
 
-	/* Parametric equation
-		x = cx + r * cos(a)
-		y = cy + r * sin(a)
-	*/
-	vector3 point1 = vector3(0.0f, 0.0f, 0.0f);
-	vector3 point2 = vector3();
-	vector3 point3 = vector3();
+	// Define a roation matrix
+	glm::mat4 rotationMatrix(1);
 
-	AddTri(point1, point2, point3);
+	// 2pi / # of subdividions - how much to rotate by
+	float angleOfRotation = (2 * PI) / a_nSubdivisions;
+
+	rotationMatrix = glm::rotate(rotationMatrix, angleOfRotation, vector3(0.0f, 0.0f, 1.0f));
+
+	// Define our 3 vectors to start at/rotate
+	vector3 point1 = vector3(0.0f, 0.0f, 0.0f); // "Center"
+	vector3 point2 = vector3(0.0f, a_fRadius, 0.0f); // "Top"
+	vector3 point3 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+	// Add the points to be rendered
+	AddVertexPosition(point1);
+	AddVertexPosition(point2);
+	AddVertexPosition(point3);
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		// Recalculate points 2 and 3
+		// THIS IS SO OBVIOUS BUT IS NOT INTUITIVE TO FIGURE OUT!!!
+		point2 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+		point3 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+		// Add the points to be rendered
+		/* Could use verticies, but...
+		AddVertexPosition(point1);
+		AddVertexPosition(point2);
+		AddVertexPosition(point3);
+		*/
+
+		// ...why not use the triangles?
+		AddTri(point1, point2, point3);
+	}
+
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);

@@ -275,9 +275,47 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	// Define a roation matrix
+	glm::mat4 rotationMatrix(1);
+
+	// 2pi / # of subdividions - how much to rotate by
+	float angleOfRotation = (2 * PI) / a_nSubdivisions;
+
+	rotationMatrix = glm::rotate(rotationMatrix, angleOfRotation, vector3(0.0f, 0.0f, 1.0f));
+
+	// Define our 3 vectors to start at/rotate
+	vector3 point1 = vector3(0.0f, 0.0f, 0.0f); // "Center"
+	vector3 point2 = vector3(0.0f, a_fRadius, 0.0f); // "Top"
+	vector3 point3 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+	// Add the points to be rendered
+	AddVertexPosition(point1);
+	AddVertexPosition(point2);
+	AddVertexPosition(point3);
+
+	// Draw the base
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		// Recalculate points 2 and 3
+		point2 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+		point3 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+		// ...why not use the triangles?
+		AddTri(point1, point2, point3);
+	}
+
+	// Tip of the cone
+	point1 = vector3(0.0f, 0.0f, (-1) * a_fHeight);
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		// Recalculate points 2 and 3
+		point2 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+		point3 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+		// Flipping around how the trianglesx are drawn so they render on the correct side
+		AddTri(point3, point2, point1);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -299,9 +337,40 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	// Define a roation matrix
+	glm::mat4 rotationMatrix(1);
+
+	// 2pi / # of subdividions - how much to rotate by
+	float angleOfRotation = (2 * PI) / a_nSubdivisions;
+
+	rotationMatrix = glm::rotate(rotationMatrix, angleOfRotation, vector3(0.0f, 0.0f, 1.0f));
+
+	// Define our 3 vectors to start at/rotate
+	vector3 point1 = vector3(0.0f, 0.0f, 0.0f); // "Center"
+	vector3 point2 = vector3(0.0f, a_fRadius, 0.0f); // "Top"
+	vector3 point3 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		// Recalculate points 2 and 3 for the base
+		point2 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+		point3 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+		// Draw the base
+		AddTri(point3, point2, point1);
+
+		// Calculate the quads that draw the faces of the cylinder
+		vector3 point4 = point2 + vector3(0.0f, 0.0f, a_fHeight);
+		vector3 point5 = point3 + vector3(0.0f, 0.0f, a_fHeight);
+
+		// Draw the quads that make up the faces
+		AddQuad(point2, point3, point4, point5);
+
+		// Draw the top
+		vector3 point6 = point1 + vector3(0.0f, 0.0f, a_fHeight);
+		AddTri(point6, point4, point5);
+	}
+
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -329,9 +398,44 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	// Define a roation matrix
+	glm::mat4 rotationMatrix(1);
+
+	// 2pi / # of subdividions - how much to rotate by
+	float angleOfRotation = (2 * PI) / a_nSubdivisions;
+
+	rotationMatrix = glm::rotate(rotationMatrix, angleOfRotation, vector3(0.0f, 0.0f, 1.0f));
+
+	// Define starting points
+	vector3 point1 = vector3(a_fInnerRadius, 0.0f, 0.0f); // Inner "Left" Point
+	vector3 point3 = (vector3)(vector4(rotationMatrix * vector4(point1, 0.0f))); // Inner "Right" Point
+
+	vector3 point2 = vector3(a_fOuterRadius, 0.0f, 0.0f);// Outer "Left" Point
+	vector3 point4 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f))); // OUter "Right" point
+
+	vector3 heightVector = vector3(0.0f, 0.0f, a_fHeight);
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		// Recalculate the points by rotating them from themselves (which sound trippy but that's how math be)
+		point1 = (vector3)(vector4(rotationMatrix * vector4(point1, 0.0f)));
+		point3 = (vector3)(vector4(rotationMatrix * vector4(point1, 0.0f)));
+
+		point2 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+		point4 = (vector3)(vector4(rotationMatrix * vector4(point2, 0.0f)));
+
+		// Draw the base
+		AddQuad(point1, point3, point2, point4);
+
+		//Draw the outer sides
+		AddQuad(point2, point4, (point2 + heightVector), (point4 + heightVector));
+
+		// Draw the inner sides
+		AddQuad((point1 + heightVector), (point3 + heightVector), point1, point3);
+
+		// Draw the top
+		AddQuad((point2 + heightVector), (point4 + heightVector), (point1 + heightVector), (point3 + heightVector));
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
