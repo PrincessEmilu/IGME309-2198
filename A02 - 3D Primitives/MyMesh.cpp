@@ -546,10 +546,6 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		}
 	}
 
-
-
-
-
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
