@@ -4,9 +4,9 @@ using namespace Simplex;
 void MyRigidBody::Init(void)
 {
 	m_pMeshMngr = MeshManager::GetInstance();
-	m_bVisibleBS = false;
+	m_bVisibleBS = true;
 	m_bVisibleOBB = true;
-	m_bVisibleARBB = false;
+	m_bVisibleARBB = true;
 
 	m_fRadius = 0.0f;
 
@@ -276,17 +276,173 @@ void MyRigidBody::AddToRenderList(void)
 
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
-	/*
-	Your code goes here instead of this comment;
+	// Radius for this, and other
+	float radius1;
+	float radius2;
 
-	For this method, if there is an axis that separates the two objects
-	then the return will be different than 0; 1 for any separating axis
-	is ok if you are not going for the extra credit, if you could not
-	find a separating axis you need to return 0, there is an enum in
-	Simplex that might help you [eSATResults] feel free to use it.
-	(eSATResults::SAT_NONE has a value of 0)
-	*/
+	// Keep track of this object's local axes
+	vector3 localAxis[3];
 
-	//there is no axis test that separates this two objects
-	return eSATResults::SAT_NONE;
+	// Convert each to worldspace
+	localAxis[0] = vector3(m_m4ToWorld * vector4(1.0f, 0.0f, 0.0f, 0.0f));
+	localAxis[1] = vector3(m_m4ToWorld * vector4(0.0f, 1.0f, 0.0f, 0.0f));
+	localAxis[2] = vector3(m_m4ToWorld * vector4(0.0f, 0.0f, 1.0f, 0.0f));
+	
+	// Keep track of the other's axes
+	vector3 localAxisOther[3];
+
+	// Don't need to convert here to worldspace here as it's already done, just need to get the axes
+	localAxisOther[0] = vector3(a_pOther->GetModelMatrix() * vector4(1.0f, 0.0f, 0.0f, 0.0f));
+	localAxisOther[1] = vector3(a_pOther->GetModelMatrix() * vector4(0.0f, 1.0f, 0.0f, 0.0f));
+	localAxisOther[2] = vector3(a_pOther->GetModelMatrix() * vector4(0.0f, 0.0f, 1.0f, 0.0f));
+
+	// declare rotation matrices to fill out
+	matrix3 roationMatrix;
+	matrix3 absoluteRotationMatrix;
+
+	// Populate our roation matrix by translating the other's rotation into our local frame
+	for (uint i = 0; i < 3; i++)
+	{
+		for (uint j = 0; j < 3; j++)
+		{
+			roationMatrix[i][j] = glm::dot(localAxis[i], localAxisOther[j]);
+		}
+	}
+
+	// Convert to absolutes
+	for (uint i = 0; i < 3; i++)
+	{
+		for (uint j = 0; j < 3; j++)
+		{
+			absoluteRotationMatrix[i][j] = std::abs(roationMatrix[i][j]) + 0.0001f;
+		}
+	}
+
+	// Get translate vector - Other minus ours
+	vector3 translationVector = a_pOther->GetCenterGlobal() - GetCenterGlobal();
+
+	translationVector = vector3(glm::dot(translationVector, localAxis[0]),
+								glm::dot(translationVector, localAxis[1]),
+								glm::dot(translationVector, localAxis[2]));
+
+	// We test each axis by caluclating the radii and checking if they overlap
+	// Almost all of this was simply coping from the textbook linked in the lecture: http://www.r-5.org/files/books/computers/algo-list/realtime-3d/Christer_Ericson-Real-Time_Collision_Detection-EN.pdf
+	// A0, A1, A2
+	for (uint i = 0; i < 3; i++)
+	{
+		radius1 = m_v3HalfWidth[i];
+		radius2 = a_pOther->m_v3HalfWidth[0]
+			* absoluteRotationMatrix[i][0] + a_pOther->m_v3HalfWidth[1]
+			* absoluteRotationMatrix[i][1] + a_pOther->m_v3HalfWidth[2]
+			* absoluteRotationMatrix[i][2];
+
+		if (std::abs(translationVector[i]) > radius1 + radius2)
+			return 1;
+	}
+
+	// B0, B1, B2
+	for (uint i = 0; i < 3; i++)
+	{
+		radius1 = m_v3HalfWidth[0]
+			* absoluteRotationMatrix[0][i] + m_v3HalfWidth[1]
+			* absoluteRotationMatrix[1][i] + m_v3HalfWidth[2]
+			* absoluteRotationMatrix[2][i];
+
+		radius2 = a_pOther->m_v3HalfWidth[i];
+
+		if (std::abs(translationVector[0] * roationMatrix[0][i] + translationVector[1] * roationMatrix[1][i] + translationVector[2] * roationMatrix[2][i])
+				> radius1 + radius2)
+			return 1;
+	}
+
+	// Test axesL = A0, L = A1, L = A2
+	for (uint i = 0; i < 3; i++)
+	{
+		radius1 = m_v3HalfWidth[i];
+		radius2 = a_pOther->m_v3HalfWidth[0] * absoluteRotationMatrix[i][0]
+			+ a_pOther->m_v3HalfWidth[1] * absoluteRotationMatrix[i][1]
+			+ a_pOther->m_v3HalfWidth[2] * absoluteRotationMatrix[i][2];
+
+		if (std::abs(translationVector[i]) > radius1 + radius2)
+			return 1;
+	}
+
+	// Test axesL=B0,L=B1,L=B2
+	for (uint i = 0; i < 3; i++)
+	{
+		radius1 = m_v3HalfWidth[0] * absoluteRotationMatrix[0][i]
+			+ m_v3HalfWidth[1] * absoluteRotationMatrix[1][i]
+			+ m_v3HalfWidth[2] * absoluteRotationMatrix[2][i];
+
+		radius2 = a_pOther->m_v3HalfWidth[i];
+
+		if (std::abs(translationVector[0] * roationMatrix[0][i] + translationVector[1] * roationMatrix[1][i] + translationVector[2] * roationMatrix[2][i]) > radius1 + radius2)
+			return 1;
+	}
+
+	// Test axis L = A0 x B0
+	radius1 = m_v3HalfWidth[1] * absoluteRotationMatrix[2][0] + m_v3HalfWidth[2] * absoluteRotationMatrix[1][0];
+	radius2 = a_pOther->m_v3HalfWidth[1] * absoluteRotationMatrix[0][2] + a_pOther->m_v3HalfWidth[2] * absoluteRotationMatrix[0][1];
+
+	if (std::abs(translationVector[2] * roationMatrix[1][0] - translationVector[1] * roationMatrix[2][0]) > radius1 + radius2)
+		return 1;
+
+	// Test axis L = A0 x B1
+	radius1 = m_v3HalfWidth[1] * absoluteRotationMatrix[2][1] + m_v3HalfWidth[2] * absoluteRotationMatrix[1][1];
+	radius2 = a_pOther->m_v3HalfWidth[0] * absoluteRotationMatrix[0][2] + a_pOther->m_v3HalfWidth[2] * absoluteRotationMatrix[0][0];
+
+	if (std::abs(translationVector[2] * roationMatrix[1][1] - translationVector[1] * roationMatrix[2][1]) > radius1 + radius2)
+		return 1;
+
+	// Test Axis L = A0 x B2
+	radius1 = m_v3HalfWidth[1] * absoluteRotationMatrix[2][2] + m_v3HalfWidth[2] * absoluteRotationMatrix[1][2];
+	radius2 = a_pOther->m_v3HalfWidth[0] * absoluteRotationMatrix[0][1] + a_pOther->m_v3HalfWidth[1] * absoluteRotationMatrix[0][0];
+
+	if (std::abs(translationVector[2] * roationMatrix[1][2] - translationVector[1] * roationMatrix[2][2]) > radius1 + radius2)
+		return 1;
+
+	// Test Axis L = A1 x B0
+	radius1 = m_v3HalfWidth[0] * absoluteRotationMatrix[2][0] + m_v3HalfWidth[2] * absoluteRotationMatrix[0][0];
+	radius2 = a_pOther->m_v3HalfWidth[1] * absoluteRotationMatrix[1][2] + a_pOther->m_v3HalfWidth[2] * absoluteRotationMatrix[1][1];
+
+	if (std::abs(translationVector[0] * roationMatrix[2][0] - translationVector[2] * roationMatrix[0][0]) > radius1 + radius2)
+		return 1;
+
+	// Test axis L = A1 x B1
+	radius1 = m_v3HalfWidth[0] * absoluteRotationMatrix[2][1] + m_v3HalfWidth[2] * absoluteRotationMatrix[0][1];
+	radius2 = a_pOther->m_v3HalfWidth[0] * absoluteRotationMatrix[1][2] + a_pOther->m_v3HalfWidth[2] * absoluteRotationMatrix[1][0];
+
+	if (std::abs(translationVector[0] * roationMatrix[2][1] - translationVector[2] * roationMatrix[0][1]) > radius1 + radius2)
+		return 1;
+
+	// Test axis L = A1 X B2
+	radius1 = m_v3HalfWidth[0] * absoluteRotationMatrix[2][2] + m_v3HalfWidth[2] * absoluteRotationMatrix[0][2];
+	radius2 = a_pOther->m_v3HalfWidth[0] * absoluteRotationMatrix[1][1] + a_pOther->m_v3HalfWidth[1] * absoluteRotationMatrix[1][0];
+
+	if (std::abs(translationVector[0] * roationMatrix[2][2] - translationVector[2] * roationMatrix[0][2]) > radius1 + radius2)
+		return 1;
+
+	// Test Axis L = A2 x B0
+	radius1 = m_v3HalfWidth[0] * absoluteRotationMatrix[1][0] + m_v3HalfWidth[1] * absoluteRotationMatrix[0][0];
+	radius2 = a_pOther->m_v3HalfWidth[1] * absoluteRotationMatrix[2][2] + a_pOther->m_v3HalfWidth[2] * absoluteRotationMatrix[2][1];
+
+	if (std::abs(translationVector[1] * roationMatrix[0][0] - translationVector[0] * roationMatrix[1][0]) > radius1 + radius2)
+		return 1;
+
+	// Test Axis L = A2 * B1
+	radius1 = m_v3HalfWidth[0] * absoluteRotationMatrix[1][1] + m_v3HalfWidth[1] * absoluteRotationMatrix[0][1];
+	radius2 = a_pOther->m_v3HalfWidth[0] * absoluteRotationMatrix[2][2] + a_pOther->m_v3HalfWidth[2] * absoluteRotationMatrix[2][0];
+
+	if (std::abs(translationVector[1] * roationMatrix[0][1] - translationVector[0] * roationMatrix[1][1]) > radius1 + radius2)
+		return 1;
+
+	// Test Axis L = A2 * B2
+	radius1 = m_v3HalfWidth[0] * absoluteRotationMatrix[1][2] + m_v3HalfWidth[1] * absoluteRotationMatrix[0][2];
+	radius2 = a_pOther->m_v3HalfWidth[0] * absoluteRotationMatrix[2][1] + a_pOther->m_v3HalfWidth[1] * absoluteRotationMatrix[2][0];
+
+	if (std::abs(translationVector[1] * roationMatrix[0][2] - translationVector[0] * roationMatrix[1][2]) > radius1 + radius2)
+		return 1;
+
+	// Nothing found, return 0
+	return 0;
 }
