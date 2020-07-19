@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F79AA1D5-E361-471B-9B86-7415A99E8DCD}</ProjectGuid>
-    <RootNamespace>A02</RootNamespace>
-    <ProjectName>A02</ProjectName>
+    <ProjectGuid>{856553E6-7CC9-40A4-9CE6-E6B78F204B60}</ProjectGuid>
+    <RootNamespace>A02 - 3D Primitives</RootNamespace>
+    <ProjectName>A02 - 3D Primitives</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
