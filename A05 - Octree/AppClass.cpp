@@ -31,7 +31,7 @@ void Application::InitVariables(void)
 	}
 
 	m_uOctantLevels = 1;
-	//m_pRoot = new Octree(m_uOctantLevels, 5);
+	m_pRoot = new MyOctant(nullptr, 0, 0, 0);
 	m_pEntityMngr->Update();
 }
 void Application::Update(void)
@@ -56,9 +56,8 @@ void Application::Display(void)
 	// Clear the screen
 	ClearScreen();
 
-	//display octree
-	//m_pRoot->Display(); <---
-	m_pMeshMngr->AddCubeToRenderList(IDENTITY_M4, C_RED, RENDER_WIRE);
+	// Display the Octant(s)
+	m_pRoot->DisplayOctant();
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
@@ -78,6 +77,7 @@ void Application::Display(void)
 void Application::Release(void)
 {
 	//release the octree
+	SafeDelete(m_pRoot);
 
 
 	//release GUI

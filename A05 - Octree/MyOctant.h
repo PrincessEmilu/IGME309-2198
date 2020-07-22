@@ -1,24 +1,27 @@
-#ifndef __OCTANT_H_
-#define __OCTANT_H_
+#ifndef _MYOCTANT_H_
+#define _MYOCTANT_H_
 
 #include "MyEntity.h"
+#include "MyEntityManager.h"
 
-class Octant
+class MyOctant
 {
 public:
 
 	// The big 3 (why is it not called 4?)
 	// Constructor
-	Octant(int totalDivisionLevels, int divisionLevel, int optimalObjects);
+	MyOctant(MyOctant* parent, int totalDivisionLevels, int divisionLevel, int optimalObjects);
 
 	// Copy Constructor
-	Octant(Octant const& other);
+	MyOctant(MyOctant const& other);
 
 	// Assignment Operator
+	/*
 	Octant& operator=(Octant const& other);
+	*/
 
 	// Destructor
-	~Octant();
+	~MyOctant();
 
 	// Accessors (I miss C# Properties)
 	int GetDivisionLevel();
@@ -27,16 +30,29 @@ public:
 	bool HasChildren();
 
 	// Tells this octant to subdivide
-	void Subdivide();
+	//void Subdivide();
+
+	// Displays the Octants
+	void DisplayOctant();
 
 private:
+
+	// References to managers
+	Simplex::MeshManager* m_meshManager = nullptr;
+	Simplex::MyEntityManager* m_entityManager = nullptr;
 
 	// Min/Max Coordinates of the octant
 	Simplex::vector3 m_minimumCoordinates;
 	Simplex::vector3 m_maximumCoordinates;
 
-	// Center Point of the octant
-	Simplex::vector3 m_centerPoint;
+	// Dimensions of the cuboid representing this Octant
+	Simplex::vector3 m_cuboidDimensions;
+
+	// Centerpoint for this octant
+	Simplex::vector3 m_CenterPoint;
+
+	// Indecies of entities contained in this octant
+	std::vector<Simplex::uint> m_entityVector;
 
 	// The number of children that an octant should have, if it has children
 	const int m_MaxSubdivisions = 8;
@@ -53,18 +69,17 @@ private:
 	// Optimal number of objects per octant; might not be used?
 	int m_OptimalObjects;
 
-	// The entities that are in this octant
-	std::vector<Simplex::MyEntity*> m_entityVector;
-
 	// The child octants: Might Consider making this an array instead of a vector because it will always be constant size?
-	std::vector<Octant*> m_octantVector;
+	//std::vector<Octant*> m_octantVector;
 
-	// Setup subdivision and take the steps to subdivide
-	void Subdivide();
+	// Calculates the appropriate size for this octant
+	void CalculateCuboidDimensions();
 
 	// Add all entities within this subdivision's space to the vector
 	void PopulateEntityVector();
+
+	// Setup subdivision and take the steps to subdivide
+	void Subdivide();
 };
 
-#endif //__OCTANT_H_
-
+#endif // !_OCTANT_H_

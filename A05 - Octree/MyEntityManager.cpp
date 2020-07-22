@@ -178,7 +178,7 @@ void Simplex::MyEntityManager::Update(void)
 	{
 		for (uint j = i + 1; j < m_uEntityCount; j++)
 		{
-			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
+			//m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
 		}
 	}
 }
