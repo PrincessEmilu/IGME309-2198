@@ -104,6 +104,9 @@ private:
 	// The number of children that an octant should have, if it has children
 	const int m_MaxSubdivisions = 8;
 
+	// Will this octant subdivide
+	bool m_isLeafNode;
+
 	// Which cube out of 8 is it
 	int m_cubeOutOfEight;
 	// The current count of subdivisions; might just use this in a loop, or use the count of a list.

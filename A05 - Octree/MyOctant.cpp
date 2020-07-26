@@ -1,5 +1,7 @@
 #include "MyOctant.h"
 
+static Simplex::uint totalDimensions = 0;
+
 // Return a vector for the given Octant number
 Simplex::vector3 MyOctant::GetOctantPositionVector(int index)
 {
@@ -87,10 +89,8 @@ void MyOctant::SetupRigidBody()
 
 MyOctant::MyOctant(MyOctant* parent, int outOfEight, int dimension, int divisionLevel, int totalDivisionLevels)
 {
-
-	static Simplex::uint totalDimensions = 0;
 	totalDimensions++;
-	std::cout << "\n" << "Total Dimensions: " << totalDimensions << "\n";
+	//std::cout << "\n" << "Total Dimensions: " << totalDimensions << "\n";
 
 	// Assign member variables
 	m_parentOctant = parent;
@@ -111,10 +111,12 @@ MyOctant::MyOctant(MyOctant* parent, int outOfEight, int dimension, int division
 	// Setup the rigid body using the entity manager entites
 	SetupRigidBody();
 
+	// Will this object subdivide?
+	m_isLeafNode = m_divisionLevel < m_totalDivisionLevels;
+
 	// Starting from scratch- this is the very first octant in the octree
 	if (m_parentOctant == nullptr)
 	{
-
 		CalculateFirstCuboidDimensions();
 		PopulateEntityVector();
 	}
@@ -126,7 +128,7 @@ MyOctant::MyOctant(MyOctant* parent, int outOfEight, int dimension, int division
 	}
 
 	// Create more octants if we need to go deeper!
-	if (m_divisionLevel < m_totalDivisionLevels)
+	if (m_isLeafNode)
 		Subdivide();
 }
 
@@ -274,7 +276,9 @@ void MyOctant::PopulateEntityVector()
 	{
 		// If the entity's rigid body is colliding with this one, add it to the entity list
 		if (m_rigidBody->IsColliding(m_entityManager->GetEntity(i)->GetRigidBody()))
+		{
 			m_entityVector.push_back(i);
+		}
 	}
 
 	//std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
@@ -288,7 +292,14 @@ void MyOctant::PopulateEntityVector(const std::vector<Simplex::uint>& entityVect
 	{
 		// If the center is within the min/max of this cuboid, add to this octant
 		if (m_rigidBody->IsColliding(m_entityManager->GetEntity(i)->GetRigidBody()))
+		{
 			m_entityVector.push_back(i);
+
+			if (m_isLeafNode)
+			{
+				m_entityManager->GetEntity(i)->AddDimension(totalDimensions);
+			}
+		}
 	}
 
 	//std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";

@@ -179,8 +179,7 @@ void Simplex::MyEntityManager::Update(void)
 		for (uint j = i + 1; j < m_uEntityCount; j++)
 		{
 			// Only do a collision check if they share a dimension
-			//if (m_mEntityArray[i]->SharesDimension(m_mEntityArray[j]))
-				//m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
+			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
 		}
 	}
 }
