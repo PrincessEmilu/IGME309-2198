@@ -67,21 +67,9 @@ Simplex::vector3 MyOctant::GetNewOctantColor(int index)
 	}
 }
 
-void MyOctant::SetCenterPoint()
+void MyOctant::SetCenterPoint(Simplex::vector3 center)
 {
-	// Center of the world
-	if (!m_parentOctant)
-	{
-		m_CenterPoint = Simplex::vector3(0.0f);
-	}
-	else
-	{
-		auto octantOffset = GetOctantPositionVector(m_cubeOutOfEight);
-		//std::cout << "\Offset: " << octantOffset.x << ", " << octantOffset.y << ", " << octantOffset.z << "\n";
-		//std::cout << "Out of eight: " << m_cubeOutOfEight;
-		m_CenterPoint = Simplex::vector3((m_cuboidDimensions.x / 4) * m_cubeOutOfEight * octantOffset.x, (m_cuboidDimensions.y / 4) * m_cubeOutOfEight * octantOffset.y, (m_cuboidDimensions.z / 4) * m_cubeOutOfEight * octantOffset.z);
-		//std::cout << "\nCenterpoint: " << m_CenterPoint.x << ", " << m_CenterPoint.y << ", " << m_CenterPoint.z << "\n";
-	}
+	m_CenterPoint = center;
 }
 
 void MyOctant::SetupRigidBody()
@@ -203,14 +191,15 @@ void MyOctant::DisplayOctant()
 	if (m_rigidBody)
 		m_rigidBody->AddToRenderList();
 
-	m_meshManager->AddSphereToRenderList(glm::translate(Simplex::IDENTITY_M4, m_CenterPoint), Simplex::C_RED, 1);
-
-
 	if (HasChildren())
 	{
 		for (auto octant : m_childrenVector)
 			octant->DisplayOctant();
 	}
+
+	// Draw debug spheres for center points
+	//auto actualCenter = m_rigidBody->GetCenterGlobal();
+	//m_meshManager->AddSphereToRenderList(glm::translate(Simplex::IDENTITY_M4, actualCenter), Simplex::C_RED, 1);
 }
 
 void MyOctant::CalculateFirstCuboidDimensions()
@@ -263,15 +252,18 @@ void MyOctant::CalculateChildCuboidDimensions(int octantSegment)
 	// Get the correct offset for this octant
 	Simplex::vector3 octantOffset = GetOctantPositionVector(m_cubeOutOfEight);
 
-	// Set the center point
-	SetCenterPoint();
+	// Set the start center of model matrix to parent center
+	m_rigidBody->SetModelMatrix(glm::translate(m_parentOctant->GetRigidBody()->GetCenterGlobal()));
 
-	// Transform the rigidbody - Move it to be in the correct centerpoint, and scale it down.
+	// Translate the rigidbody to the correct position
 	m_rigidBody->SetModelMatrix(glm::translate(m_rigidBody->GetModelMatrix(), Simplex::vector3((m_cuboidDimensions.x / 2) * octantOffset.x, (m_cuboidDimensions.y / 2) * octantOffset.y, (m_cuboidDimensions.z / 2) * octantOffset.z)));
-	m_rigidBody->SetModelMatrix(glm::scale(m_rigidBody->GetModelMatrix(), Simplex::vector3(0.5f, 0.5f, 0.5f)));
+	
+	// Scale it down based on the current dimension level
+	for (Simplex::uint i = 0; i < m_divisionLevel - 1; i++)
+		m_rigidBody->SetModelMatrix(glm::scale(m_rigidBody->GetModelMatrix(), Simplex::vector3(0.5f, 0.5f, 0.5f)));
 
-	// Translate this matrix from the identity
-	//m_matrix = glm::translate(m_matrix, Simplex::vector3(quarterX * octantOffset.x, quarterY * octantOffset.y, quarterZ * octantOffset.z));
+	// Set the octant's known centerpoint
+	SetCenterPoint(m_rigidBody->GetCenterGlobal());
 }
 
 void MyOctant::PopulateEntityVector()

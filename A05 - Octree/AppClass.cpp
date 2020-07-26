@@ -31,7 +31,7 @@ void Application::InitVariables(void)
 	}
 
 	// Kick off the octants
-	m_uOctantLevels = 2;
+	m_uOctantLevels = 4;
 	m_pRoot = new MyOctant(nullptr, 0, 0, 1, m_uOctantLevels);
 
 

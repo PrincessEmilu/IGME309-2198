@@ -115,15 +115,13 @@ private:
 	// The total divisions that this Octant (and the others in the structure) should account for
 	int m_totalDivisionLevels;
 
-	// Optimal number of objects per octant; might not be used?
-	int m_OptimalObjects;
 
 	Simplex::vector3 GetOctantPositionVector(int index);
 
 	Simplex::vector3 GetNewOctantColor(int index);
 
 	// Set the center point
-	void SetCenterPoint();
+	void SetCenterPoint(Simplex::vector3 center);
 
 	// Sets up the rigidbody
 	void SetupRigidBody();
