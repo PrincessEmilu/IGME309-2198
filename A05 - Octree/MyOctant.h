@@ -55,6 +55,9 @@ public:
 	// Get the dimenions of this octant's cuboid
 	Simplex::vector3 GetCuboidDimensions();
 
+	// Get the rigidbody
+	Simplex::MyRigidBody* GetRigidBody();
+
 	// Get this octant's list of entity indecies
 	const std::vector<Simplex::uint>& GetEntityVector();
 
@@ -68,6 +71,9 @@ public:
 	void DisplayOctant();
 
 private:
+
+	//The rigidbody of this octant
+	Simplex::MyRigidBody* m_rigidBody = nullptr;
 
 	//Child Octants (nodes)
 	std::vector<MyOctant*> m_childrenVector;
@@ -111,6 +117,11 @@ private:
 	int m_OptimalObjects;
 
 	Simplex::vector3 GetOctantPositionVector(int index);
+
+	Simplex::vector3 GetNewOctantColor(int index);
+
+	// Sets up the rigidbody
+	void SetupRigidBody();
 
 	// Calculates the appropriate size for the first octant
 	void CalculateFirstCuboidDimensions();
