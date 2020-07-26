@@ -26,7 +26,7 @@ MyOctant::MyOctant(MyOctant* parent, int dimension, int divisionLevel, int total
 	// Else, this is a child octant from another octant and must be constructed a little differently
 	else
 	{
-		CalculateChildCuboidDimensions();
+		CalculateChildCuboidDimensions(m_dimension / m_divisionLevel);
 		PopulateEntityVector(m_parentOctant->GetEntityVector());
 	}
 
@@ -97,6 +97,40 @@ void MyOctant::DisplayOctant()
 	}
 }
 
+// Return a vector for the given Octant number
+Simplex::vector3 MyOctant::GetOctantPositionVector(int index)
+{
+	switch (index)
+	{
+	case OctantSegments::BOTTOM_LEFT_FRONT:
+		return BOTTOM_LEFT_FRONT_VECTOR;
+
+	case OctantSegments::BOTTOM_LEFT_REAR:
+		return BOTTOM_LEFT_REAR_VECTOR;
+
+	case OctantSegments::BOTTOM_RIGHT_FRONT:
+		return BOTTOM_RIGHT_FRONT_VECTOR;
+
+	case OctantSegments::BOTTOM_RIGHT_REAR:
+		return BOTTOM_RIGHT_REAR_VECTOR;
+
+	case OctantSegments::TOP_LEFT_FRONT:
+		return TOP_LEFT_FRONT_VECTOR;
+
+	case OctantSegments::TOP_LEFT_REAR:
+		return TOP_LEFT_REAR_VECTOR;
+
+	case OctantSegments::TOP_RIGHT_FRONT:
+		return TOP_RIGHT_FRONT_VECTOR;
+
+	case OctantSegments::TOP_RIGHT_REAR:
+		return TOP_RIGHT_REAR_VECTOR;
+
+	default:
+		return Simplex::vector3(0.0f);
+	}
+}
+
 void MyOctant::CalculateFirstCuboidDimensions()
 {
 	// TODO: This should probably not be hardcoded to be the entity manager count
@@ -133,7 +167,7 @@ void MyOctant::CalculateFirstCuboidDimensions()
 	m_cuboidDimensions.z = m_maximumCoordinates.z + std::abs(m_minimumCoordinates.z);
 }
 
-void MyOctant::CalculateChildCuboidDimensions()
+void MyOctant::CalculateChildCuboidDimensions(int octantSegment)
 {
 	// Cube should be a fraction of the parent
 	auto parentDimensions = m_parentOctant->GetCuboidDimensions();
@@ -146,8 +180,11 @@ void MyOctant::CalculateChildCuboidDimensions()
 	m_cuboidDimensions.y = parentDimensions.y / 2;
 	m_cuboidDimensions.z = parentDimensions.z / 2;
 
+	// Get the correct offset for this octant
+	Simplex::vector3 octantOffset = GetOctantPositionVector(m_dimension);
+
 	// Translate this matrix from the identity
-	m_matrix = glm::translate(m_matrix, Simplex::vector3(quarterX * TOP_LEFT_VECTOR.x, quarterY * TOP_LEFT_VECTOR.y, quarterZ * TOP_LEFT_VECTOR.z));
+	m_matrix = glm::translate(m_matrix, Simplex::vector3(quarterX * octantOffset.x, quarterY * octantOffset.y, quarterZ * octantOffset.z));
 }
 
 void MyOctant::PopulateEntityVector()
@@ -198,6 +235,9 @@ void MyOctant::Subdivide()
 {
 	std::cout << "\n\nSubdivide()\n\n";
 
-	// TODO: This should be a loop?
-	m_childrenVector.push_back(new MyOctant(this, m_dimension + 1, m_divisionLevel + 1, m_totalDivisionLevels));
+	for (Simplex::uint i = 0; i < m_MaxSubdivisions; i++)
+	{
+		int childDimension = (m_dimension + 1) + i;
+		m_childrenVector.push_back(new MyOctant(this, childDimension, m_divisionLevel + 1, m_totalDivisionLevels));
+	}
 }

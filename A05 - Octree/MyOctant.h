@@ -6,9 +6,31 @@
 
 class MyOctant
 {
-#define TOP_LEFT_VECTOR Simplex::vector3(-1.0f, -1.0f, -1.0f)
+#define TOP_LEFT_REAR_VECTOR Simplex::vector3(-1.0f, 1.0f, -1.0f)
+#define BOTTOM_LEFT_REAR_VECTOR Simplex::vector3(-1.0f, -1.0f, -1.0f)
+
+#define BOTTOM_RIGHT_REAR_VECTOR Simplex::vector3(1.0f, -1.0f, -1.0f)
+#define TOP_RIGHT_REAR_VECTOR Simplex::vector3(1.0f, 1.0f, -1.0f)
+
+#define TOP_LEFT_FRONT_VECTOR Simplex::vector3(-1.0f, 1.0f, 1.0f)
+#define BOTTOM_LEFT_FRONT_VECTOR Simplex::vector3(-1.0f, -1.0f, 1.0f)
+
+#define TOP_RIGHT_FRONT_VECTOR Simplex::vector3(1.0f, 1.0f, 1.0f)
+#define BOTTOM_RIGHT_FRONT_VECTOR Simplex::vector3(1.0f, -1.0f, 1.0f)
 
 public:
+
+	enum OctantSegments
+	{
+		TOP_LEFT_FRONT = 1,
+		BOTTOM_LEFT_FRONT,
+		TOP_RIGHT_FRONT,
+		BOTTOM_RIGHT_FRONT,
+		TOP_LEFT_REAR,
+		BOTTOM_LEFT_REAR,
+		TOP_RIGHT_REAR,
+		BOTTOM_RIGHT_REAR
+	};
 
 	// The big 3 (why is it not called 4?)
 	// Constructor
@@ -88,11 +110,13 @@ private:
 	// Optimal number of objects per octant; might not be used?
 	int m_OptimalObjects;
 
+	Simplex::vector3 GetOctantPositionVector(int index);
+
 	// Calculates the appropriate size for the first octant
 	void CalculateFirstCuboidDimensions();
 
 	// Calculate the appropriate size of a child octant
-	void CalculateChildCuboidDimensions();
+	void CalculateChildCuboidDimensions(int octantSegment);
 
 	// Add all entites within this subdivision's space to the vector
 	void PopulateEntityVector();
