@@ -22,7 +22,7 @@ public:
 
 	enum OctantSegments
 	{
-		TOP_LEFT_FRONT = 1,
+		TOP_LEFT_FRONT = 0,
 		BOTTOM_LEFT_FRONT,
 		TOP_RIGHT_FRONT,
 		BOTTOM_RIGHT_FRONT,
@@ -34,7 +34,7 @@ public:
 
 	// The big 3 (why is it not called 4?)
 	// Constructor
-	MyOctant(MyOctant* parent, int dimension, int divisionLevel, int totalDivisionLevels);
+	MyOctant(MyOctant* parent, int outOfEight, int dimension, int divisionLevel, int totalDivisionLevels);
 
 	// Copy Constructor
 	MyOctant(MyOctant const& other);
@@ -104,6 +104,8 @@ private:
 	// The number of children that an octant should have, if it has children
 	const int m_MaxSubdivisions = 8;
 
+	// Which cube out of 8 is it
+	int m_cubeOutOfEight;
 	// The current count of subdivisions; might just use this in a loop, or use the count of a list.
 	int m_dimension;
 
@@ -119,6 +121,9 @@ private:
 	Simplex::vector3 GetOctantPositionVector(int index);
 
 	Simplex::vector3 GetNewOctantColor(int index);
+
+	// Set the center point
+	void SetCenterPoint();
 
 	// Sets up the rigidbody
 	void SetupRigidBody();

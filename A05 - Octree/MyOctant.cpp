@@ -67,6 +67,23 @@ Simplex::vector3 MyOctant::GetNewOctantColor(int index)
 	}
 }
 
+void MyOctant::SetCenterPoint()
+{
+	// Center of the world
+	if (!m_parentOctant)
+	{
+		m_CenterPoint = Simplex::vector3(0.0f);
+	}
+	else
+	{
+		auto octantOffset = GetOctantPositionVector(m_cubeOutOfEight);
+		//std::cout << "\Offset: " << octantOffset.x << ", " << octantOffset.y << ", " << octantOffset.z << "\n";
+		//std::cout << "Out of eight: " << m_cubeOutOfEight;
+		m_CenterPoint = Simplex::vector3((m_cuboidDimensions.x / 4) * m_cubeOutOfEight * octantOffset.x, (m_cuboidDimensions.y / 4) * m_cubeOutOfEight * octantOffset.y, (m_cuboidDimensions.z / 4) * m_cubeOutOfEight * octantOffset.z);
+		//std::cout << "\nCenterpoint: " << m_CenterPoint.x << ", " << m_CenterPoint.y << ", " << m_CenterPoint.z << "\n";
+	}
+}
+
 void MyOctant::SetupRigidBody()
 {
 	// Make a vector of centerpoints for the rigidbody
@@ -80,8 +97,9 @@ void MyOctant::SetupRigidBody()
 	m_rigidBody = new Simplex::MyRigidBody(centerPointVector);
 }
 
-MyOctant::MyOctant(MyOctant* parent, int dimension, int divisionLevel, int totalDivisionLevels)
+MyOctant::MyOctant(MyOctant* parent, int outOfEight, int dimension, int divisionLevel, int totalDivisionLevels)
 {
+
 	static Simplex::uint totalDimensions = 0;
 	totalDimensions++;
 	std::cout << "\n" << "Total Dimensions: " << totalDimensions << "\n";
@@ -92,6 +110,7 @@ MyOctant::MyOctant(MyOctant* parent, int dimension, int divisionLevel, int total
 	m_dimension = dimension;
 	m_divisionLevel = divisionLevel;
 	m_totalDivisionLevels = totalDivisionLevels;
+	m_cubeOutOfEight = outOfEight;
 
 	// Get manager instances
 	m_meshManager = Simplex::MeshManager::GetInstance();
@@ -184,6 +203,9 @@ void MyOctant::DisplayOctant()
 	if (m_rigidBody)
 		m_rigidBody->AddToRenderList();
 
+	m_meshManager->AddSphereToRenderList(glm::translate(Simplex::IDENTITY_M4, m_CenterPoint), Simplex::C_RED, 1);
+
+
 	if (HasChildren())
 	{
 		for (auto octant : m_childrenVector)
@@ -239,7 +261,10 @@ void MyOctant::CalculateChildCuboidDimensions(int octantSegment)
 	m_cuboidDimensions.z = parentDimensions.z / 2;
 
 	// Get the correct offset for this octant
-	Simplex::vector3 octantOffset = GetOctantPositionVector(m_dimension);
+	Simplex::vector3 octantOffset = GetOctantPositionVector(m_cubeOutOfEight);
+
+	// Set the center point
+	SetCenterPoint();
 
 	// Transform the rigidbody - Move it to be in the correct centerpoint, and scale it down.
 	m_rigidBody->SetModelMatrix(glm::translate(m_rigidBody->GetModelMatrix(), Simplex::vector3((m_cuboidDimensions.x / 2) * octantOffset.x, (m_cuboidDimensions.y / 2) * octantOffset.y, (m_cuboidDimensions.z / 2) * octantOffset.z)));
@@ -260,7 +285,7 @@ void MyOctant::PopulateEntityVector()
 			m_entityVector.push_back(i);
 	}
 
-	std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
+	//std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
 }
 
 void MyOctant::PopulateEntityVector(const std::vector<Simplex::uint>& entityVector)
@@ -274,7 +299,7 @@ void MyOctant::PopulateEntityVector(const std::vector<Simplex::uint>& entityVect
 			m_entityVector.push_back(i);
 	}
 
-	std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
+	//std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
 }
 
 void MyOctant::Subdivide()
@@ -284,7 +309,7 @@ void MyOctant::Subdivide()
 	for (Simplex::uint i = 0; i < m_MaxSubdivisions; i++)
 	{
 		int childDimension = (m_dimension + 1) + i;
-		m_childrenVector.push_back(new MyOctant(this, childDimension, m_divisionLevel + 1, m_totalDivisionLevels));
+		m_childrenVector.push_back(new MyOctant(this, i, childDimension, m_divisionLevel + 1, m_totalDivisionLevels));
 		m_childrenVector.back()->GetRigidBody()->SetColorColliding(GetNewOctantColor(i + 1));
 		m_childrenVector.back()->GetRigidBody()->SetColorNotColliding(GetNewOctantColor(i + 1));
 	}
