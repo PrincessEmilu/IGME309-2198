@@ -105,7 +105,7 @@ private:
 	const int m_MaxSubdivisions = 8;
 
 	// Will this octant subdivide
-	bool m_isLeafNode;
+	bool m_willSubdivide;
 
 	// Which cube out of 8 is it
 	int m_cubeOutOfEight;
@@ -137,9 +137,6 @@ private:
 
 	// Add all entites within this subdivision's space to the vector
 	void PopulateEntityVector();
-
-	// Add all entities within this subdivision's space to the vector, using the parent's list to save a bit of time.
-	void PopulateEntityVector(const std::vector<Simplex::uint>& entityVector);
 
 	// Setup subdivision and take the steps to subdivide
 	void Subdivide();

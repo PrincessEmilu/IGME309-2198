@@ -112,23 +112,27 @@ MyOctant::MyOctant(MyOctant* parent, int outOfEight, int dimension, int division
 	SetupRigidBody();
 
 	// Will this object subdivide?
-	m_isLeafNode = m_divisionLevel < m_totalDivisionLevels;
+	m_willSubdivide = m_divisionLevel < m_totalDivisionLevels;
 
 	// Starting from scratch- this is the very first octant in the octree
 	if (m_parentOctant == nullptr)
 	{
 		CalculateFirstCuboidDimensions();
-		PopulateEntityVector();
 	}
 	// Else, this is a child octant from another octant and must be constructed a little differently
 	else
 	{
 		CalculateChildCuboidDimensions(m_dimension / m_divisionLevel);
-		PopulateEntityVector(m_parentOctant->GetEntityVector());
+
+		if (!m_willSubdivide)
+		{
+			std::cout << "\nLeaf Node";
+			PopulateEntityVector();
+		}
 	}
 
 	// Create more octants if we need to go deeper!
-	if (m_isLeafNode)
+	if (m_willSubdivide)
 		Subdivide();
 }
 
@@ -278,27 +282,7 @@ void MyOctant::PopulateEntityVector()
 		if (m_rigidBody->IsColliding(m_entityManager->GetEntity(i)->GetRigidBody()))
 		{
 			m_entityVector.push_back(i);
-		}
-	}
-
-	//std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
-}
-
-void MyOctant::PopulateEntityVector(const std::vector<Simplex::uint>& entityVector)
-{
-	Simplex::uint entityCount = entityVector.size();
-
-	for (Simplex::uint i = 0; i < entityCount; i++)
-	{
-		// If the center is within the min/max of this cuboid, add to this octant
-		if (m_rigidBody->IsColliding(m_entityManager->GetEntity(i)->GetRigidBody()))
-		{
-			m_entityVector.push_back(i);
-
-			if (m_isLeafNode)
-			{
-				m_entityManager->GetEntity(i)->AddDimension(totalDimensions);
-			}
+			m_entityManager->GetEntity(i)->AddDimension(totalDimensions);
 		}
 	}
 
@@ -307,12 +291,14 @@ void MyOctant::PopulateEntityVector(const std::vector<Simplex::uint>& entityVect
 
 void MyOctant::Subdivide()
 {
-	std::cout << "\n\nSubdivide()\n\n";
+	//std::cout << "\n\nSubdivide()\n\n";
 
 	for (Simplex::uint i = 0; i < m_MaxSubdivisions; i++)
 	{
 		int childDimension = (m_dimension + 1) + i;
 		m_childrenVector.push_back(new MyOctant(this, i, childDimension, m_divisionLevel + 1, m_totalDivisionLevels));
+
+		// Change color for each octant, for debugging (and it looks neat)
 		m_childrenVector.back()->GetRigidBody()->SetColorColliding(GetNewOctantColor(i + 1));
 		m_childrenVector.back()->GetRigidBody()->SetColorNotColliding(GetNewOctantColor(i + 1));
 	}
