@@ -26,6 +26,9 @@ sf::Image LoadImageFromResource(const std::string& name)
 }
 void Simplex::Application::MakeNewOctree()
 {
+	// Reset the ID of the octant to display
+	m_uOctantID = 0;
+
 	// Make a vector of centerpoints for the rigidbody
 	Simplex::uint entityCount = m_pEntityMngr->GetEntityCount();
 	auto centerPointVector = std::vector<Simplex::vector3>();
@@ -33,6 +36,12 @@ void Simplex::Application::MakeNewOctree()
 		centerPointVector.push_back(m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetCenterGlobal());
 
 	m_pRoot = new MyOctant(nullptr, centerPointVector, 0, 1, m_uOctantLevels);
+
+	// Count up total octants for display purposes
+	m_uOctantCount = m_pRoot->GetOctantCount();
+
+	// Count up the total leaf nodes
+	m_uLeafOctantCount = m_pRoot->GetLeafCount();
 }
 
 Application::Application() {}

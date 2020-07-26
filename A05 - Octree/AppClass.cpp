@@ -29,8 +29,7 @@ void Application::InitVariables(void)
 			m_pEntityMngr->SetModelMatrix(m4Position);
 		}
 	}
-
-	// Kick off the octants
+	// Default octant levels to draw is just 1
 	m_uOctantLevels = 1;
 
 	// Make the octree
@@ -61,7 +60,7 @@ void Application::Display(void)
 	ClearScreen();
 
 	// Display the Octant(s)
-	m_pRoot->DisplayOctant();
+	m_pRoot->DisplayOctant(m_uOctantID);
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();

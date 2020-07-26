@@ -36,18 +36,16 @@ public:
 	// Constructor
 	MyOctant(MyOctant* parent, std::vector<Simplex::vector3> centerPointCloud, int subDivisionIndex, int divisionLevel, int totalDivisionLevels);
 
-	// Copy Constructor
-	MyOctant(MyOctant const& other);
-
-	// Assignment Operator
-	/*
-	Octant& operator=(Octant const& other);
-	*/
-
 	// Destructor
 	~MyOctant();
 
 	// Accessors (I miss C# Properties) //
+
+	// Recursive method to get the total octants
+	Simplex::uint GetOctantCount();
+
+	// Recursively get the leaf count
+	Simplex::uint GetLeafCount();
 
 	// Get the dimension of this octant
 	Simplex::uint GetDimension();
@@ -68,10 +66,7 @@ public:
 	//void Subdivide();
 
 	// Displays the Octants
-	void DisplayOctant();
-
-	// Sets isVisible
-	void Set_Visible(bool visible);
+	void DisplayOctant(Simplex::uint octantID);
 
 private:
 
@@ -90,9 +85,6 @@ private:
 
 	// Dimensions of the cuboid representing this Octant
 	Simplex::vector3 m_cuboidDimensions;
-
-	// Centerpoint for this octant
-	Simplex::vector3 m_CenterPoint;
 
 	// Indecies of entities contained in this octant
 	std::vector<Simplex::uint> m_entityVector;
@@ -115,23 +107,14 @@ private:
 	// The total divisions that this Octant (and the others in the structure) should account for
 	int m_totalDivisionLevels;
 
-	// Are octancs visible?
-	bool m_isVisible;
-
 	// Given an index, returns a vector representing the position of the octant relative to the parent
 	Simplex::vector3 GetOctantPositionVector(int index);
 
 	// Gets an octanct color for the given index
 	Simplex::vector3 GetNewOctantColor(int index);
 
-	// Set the center point
-	void SetCenterPoint(Simplex::vector3 center);
-
-	// Calculates the appropriate size for the first octant
-	void CalculateFirstCuboidDimensions();
-
 	// Calculate the appropriate size of a child octant
-	void CalculateChildCuboidDimensions(int octantSegment);
+	void CalculateCuboidDimensions(int octantSegment);
 
 	// Add all entites within this subdivision's space to the vector
 	void PopulateEntityVector();
