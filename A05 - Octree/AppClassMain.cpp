@@ -24,6 +24,17 @@ sf::Image LoadImageFromResource(const std::string& name)
 
 	return image;
 }
+void Simplex::Application::MakeNewOctree()
+{
+	// Make a vector of centerpoints for the rigidbody
+	Simplex::uint entityCount = m_pEntityMngr->GetEntityCount();
+	auto centerPointVector = std::vector<Simplex::vector3>();
+	for (Simplex::uint i = 0; i < entityCount; i++)
+		centerPointVector.push_back(m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetCenterGlobal());
+
+	m_pRoot = new MyOctant(nullptr, centerPointVector, 0, 1, m_uOctantLevels);
+}
+
 Application::Application() {}
 Application::Application(Application const& input) {}
 Application& Application::operator=(Application const& input) { return *this; }

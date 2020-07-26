@@ -130,10 +130,10 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
 			++m_uOctantLevels;
-			/*
+
+			// Clear the old octree and remake it
 			SafeDelete(m_pRoot);
-			m_pRoot = new MyOctant(m_uOctantLevels, 5);
-			*/
+			MakeNewOctree();
 		}
 		break;
 	case sf::Keyboard::Subtract:
@@ -141,10 +141,10 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
 			--m_uOctantLevels;
-			/*
+
+			// Clear the old octree and remake it
 			SafeDelete(m_pRoot);
-			m_pRoot = new MyOctant(m_uOctantLevels, 5);
-			*/
+			MakeNewOctree();
 		}
 		break;
 	case sf::Keyboard::LShift:

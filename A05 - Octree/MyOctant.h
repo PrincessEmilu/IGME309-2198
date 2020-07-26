@@ -34,7 +34,7 @@ public:
 
 	// The big 3 (why is it not called 4?)
 	// Constructor
-	MyOctant(MyOctant* parent, int outOfEight, int dimension, int divisionLevel, int totalDivisionLevels);
+	MyOctant(MyOctant* parent, std::vector<Simplex::vector3> centerPointCloud, int subDivisionIndex, int divisionLevel, int totalDivisionLevels);
 
 	// Copy Constructor
 	MyOctant(MyOctant const& other);
@@ -70,6 +70,9 @@ public:
 	// Displays the Octants
 	void DisplayOctant();
 
+	// Sets isVisible
+	void Set_Visible(bool visible);
+
 private:
 
 	//The rigidbody of this octant
@@ -82,9 +85,8 @@ private:
 	Simplex::MeshManager* m_meshManager = nullptr;
 	Simplex::MyEntityManager* m_entityManager = nullptr;
 
-	// Min/Max Coordinates of the octant
-	Simplex::vector3 m_minimumCoordinates;
-	Simplex::vector3 m_maximumCoordinates;
+	// Cloud of centerpoints for the entites
+	std::vector<Simplex::vector3> m_centerpointCloud;
 
 	// Dimensions of the cuboid representing this Octant
 	Simplex::vector3 m_cuboidDimensions;
@@ -98,17 +100,12 @@ private:
 	// The parent of this Octant
 	MyOctant* m_parentOctant;
 
-	// The transform for this octant
-	glm::mat4 m_matrix;
-
 	// The number of children that an octant should have, if it has children
 	const int m_MaxSubdivisions = 8;
 
-	// Will this octant subdivide
-	bool m_willSubdivide;
+	// Index of the octant's position vector
+	int m_subDivisionIndex;
 
-	// Which cube out of 8 is it
-	int m_cubeOutOfEight;
 	// The current count of subdivisions; might just use this in a loop, or use the count of a list.
 	int m_dimension;
 
@@ -118,16 +115,17 @@ private:
 	// The total divisions that this Octant (and the others in the structure) should account for
 	int m_totalDivisionLevels;
 
+	// Are octancs visible?
+	bool m_isVisible;
 
+	// Given an index, returns a vector representing the position of the octant relative to the parent
 	Simplex::vector3 GetOctantPositionVector(int index);
 
+	// Gets an octanct color for the given index
 	Simplex::vector3 GetNewOctantColor(int index);
 
 	// Set the center point
 	void SetCenterPoint(Simplex::vector3 center);
-
-	// Sets up the rigidbody
-	void SetupRigidBody();
 
 	// Calculates the appropriate size for the first octant
 	void CalculateFirstCuboidDimensions();

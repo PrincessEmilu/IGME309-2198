@@ -31,9 +31,10 @@ void Application::InitVariables(void)
 	}
 
 	// Kick off the octants
-	m_uOctantLevels = 3;
-	m_pRoot = new MyOctant(nullptr, 0, 0, 1, m_uOctantLevels);
+	m_uOctantLevels = 1;
 
+	// Make the octree
+	MakeNewOctree();
 
 	m_pEntityMngr->Update();
 }

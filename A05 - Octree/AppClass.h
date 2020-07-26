@@ -29,6 +29,8 @@ class Application
 private:
 	String m_sProgrammer = "Emily Horton - eh8582@rit.edu"; //programmer
 
+	void MakeNewOctree();
+
 	static ImGuiObject gui; //GUI object
 	bool m_bGUI_Main = true; //show Main GUI window?
 	bool m_bGUI_Console = true; //show Credits GUI window?

@@ -74,31 +74,20 @@ void MyOctant::SetCenterPoint(Simplex::vector3 center)
 	m_CenterPoint = center;
 }
 
-void MyOctant::SetupRigidBody()
+MyOctant::MyOctant(MyOctant* parent, std::vector<Simplex::vector3> centerPointCloud, int subDivisionIndex, int divisionLevel, int totalDivisionLevels)
 {
-	// Make a vector of centerpoints for the rigidbody
-	Simplex::uint entityCount = m_entityManager->GetEntityCount();
-	auto centerPointVector = std::vector<Simplex::vector3>();
-	for (Simplex::uint i = 0; i < entityCount; i++)
-		//Push each entity's cetner point to this vector
-		centerPointVector.push_back(m_entityManager->GetEntity(i)->GetRigidBody()->GetCenterGlobal());
-
-	// Make a new rigidbody and assign the member body to it
-	m_rigidBody = new Simplex::MyRigidBody(centerPointVector);
-}
-
-MyOctant::MyOctant(MyOctant* parent, int outOfEight, int dimension, int divisionLevel, int totalDivisionLevels)
-{
+	// Incremense the static total dimensions variable
 	totalDimensions++;
-	//std::cout << "\n" << "Total Dimensions: " << totalDimensions << "\n";
+
+	m_isVisible = true;
 
 	// Assign member variables
 	m_parentOctant = parent;
-	m_matrix = Simplex::IDENTITY_M4;
-	m_dimension = dimension;
+	m_dimension = totalDimensions;
 	m_divisionLevel = divisionLevel;
 	m_totalDivisionLevels = totalDivisionLevels;
-	m_cubeOutOfEight = outOfEight;
+	m_subDivisionIndex = subDivisionIndex;
+	m_centerpointCloud = centerPointCloud;
 
 	// Get manager instances
 	m_meshManager = Simplex::MeshManager::GetInstance();
@@ -108,31 +97,28 @@ MyOctant::MyOctant(MyOctant* parent, int outOfEight, int dimension, int division
 	m_childrenVector = std::vector<MyOctant*>();
 	m_entityVector = std::vector<Simplex::uint>();
 
-	// Setup the rigid body using the entity manager entites
-	SetupRigidBody();
+	// Make a new rigidbody using the entity centerpoints
+	m_rigidBody = new Simplex::MyRigidBody(m_centerpointCloud);
 
 	// Will this object subdivide?
-	m_willSubdivide = m_divisionLevel < m_totalDivisionLevels;
+	bool isLeafNode = !(m_divisionLevel < m_totalDivisionLevels);
 
-	// Starting from scratch- this is the very first octant in the octree
+	// If this is the first octree, calculate its dimensions
 	if (m_parentOctant == nullptr)
-	{
 		CalculateFirstCuboidDimensions();
-	}
+
 	// Else, this is a child octant from another octant and must be constructed a little differently
 	else
 	{
-		CalculateChildCuboidDimensions(m_dimension / m_divisionLevel);
+		CalculateChildCuboidDimensions(subDivisionIndex);
 
-		if (!m_willSubdivide)
-		{
-			std::cout << "\nLeaf Node";
+		// If this octant is a leaf node, populate the entity vector
+		if (isLeafNode)
 			PopulateEntityVector();
-		}
 	}
 
 	// Create more octants if we need to go deeper!
-	if (m_willSubdivide)
+	if (!isLeafNode)
 		Subdivide();
 }
 
@@ -150,8 +136,6 @@ Octant& Octant::operator=(Octant const& other)
 
 MyOctant::~MyOctant()
 {
-	std::cout << "\nOctant Destructor Called";
-
 	SafeDelete(m_rigidBody);
 
 	// Managers become nullpointers; don't delete because the appclass takes care of that
@@ -164,6 +148,9 @@ MyOctant::~MyOctant()
 		for (auto octant : m_childrenVector)
 			SafeDelete(octant);
 	}
+
+	// Reset total dimensions
+	totalDimensions = 0;
 }
 
 Simplex::uint MyOctant::GetDimension()
@@ -193,57 +180,40 @@ bool MyOctant::HasChildren()
 
 void MyOctant::DisplayOctant()
 {
+	if (!m_isVisible)
+		return;
 
+	// Add this octant to the render list
 	if (m_rigidBody)
 		m_rigidBody->AddToRenderList();
 
+	// If there are children, add the children
 	if (HasChildren())
 	{
 		for (auto octant : m_childrenVector)
 			octant->DisplayOctant();
 	}
+}
 
-	// Draw debug spheres for center points
-	//auto actualCenter = m_rigidBody->GetCenterGlobal();
-	//m_meshManager->AddSphereToRenderList(glm::translate(Simplex::IDENTITY_M4, actualCenter), Simplex::C_RED, 1);
+void MyOctant::Set_Visible(bool visible)
+{
+	m_isVisible = visible;
+
+	if (HasChildren())
+	{
+		for (auto child : m_childrenVector)
+			child->Set_Visible(false);
+	}
 }
 
 void MyOctant::CalculateFirstCuboidDimensions()
 {
-	// TODO: This should probably not be hardcoded to be the entity manager count
-	Simplex::uint entityCount = m_entityManager->GetEntityCount();
-	auto centerPointVector = std::vector<Simplex::vector3>();
+	// Set this octant's dimensions based on the min/max coordinates of the rigidbody
+	m_cuboidDimensions.x = m_rigidBody->GetMaxGlobal().x + std::abs(m_rigidBody->GetMinGlobal().x);
+	m_cuboidDimensions.y = m_rigidBody->GetMaxGlobal().y + std::abs(m_rigidBody->GetMinGlobal().y);
+	m_cuboidDimensions.z = m_rigidBody->GetMaxGlobal().z + std::abs(m_rigidBody->GetMinGlobal().z);
 
-	for (Simplex::uint i = 0; i < entityCount; i++)
-	{
-		// Get the current entity and its center point
-		Simplex::MyEntity* entity = m_entityManager->GetEntity(i);
-		Simplex::vector3 entityGCenter = entity->GetRigidBody()->GetCenterGlobal();
-
-		// Check X
-		if (entityGCenter.x < m_minimumCoordinates.x)
-			m_minimumCoordinates.x = entityGCenter.x;
-		else if (entityGCenter.x > m_maximumCoordinates.x)
-			m_maximumCoordinates.x = entityGCenter.x;
-
-		// Check Y
-		if (entityGCenter.y < m_minimumCoordinates.y)
-			m_minimumCoordinates.y = entityGCenter.y;
-		else if (entityGCenter.y > m_maximumCoordinates.y)
-			m_maximumCoordinates.y = entityGCenter.y;
-
-		// Check Z
-		if (entityGCenter.z < m_minimumCoordinates.z)
-			m_minimumCoordinates.z = entityGCenter.z;
-		else if (entityGCenter.z > m_maximumCoordinates.z)
-			m_maximumCoordinates.z = entityGCenter.z;
-	}
-
-	// Set this octant's dimensions based on the min/max coordinates
-	// TODO: Eliminate this by using the rigidbody?
-	m_cuboidDimensions.x = m_maximumCoordinates.x + std::abs(m_minimumCoordinates.x);
-	m_cuboidDimensions.y = m_maximumCoordinates.y + std::abs(m_minimumCoordinates.y);
-	m_cuboidDimensions.z = m_maximumCoordinates.z + std::abs(m_minimumCoordinates.z);
+	m_rigidBody->GetMaxGlobal() + m_rigidBody->GetMinGlobal();
 }
 
 void MyOctant::CalculateChildCuboidDimensions(int octantSegment)
@@ -256,7 +226,7 @@ void MyOctant::CalculateChildCuboidDimensions(int octantSegment)
 	m_cuboidDimensions.z = parentDimensions.z / 2;
 
 	// Get the correct offset for this octant
-	Simplex::vector3 octantOffset = GetOctantPositionVector(m_cubeOutOfEight);
+	Simplex::vector3 octantOffset = GetOctantPositionVector(m_subDivisionIndex);
 
 	// Set the start center of model matrix to parent center
 	m_rigidBody->SetModelMatrix(glm::translate(m_parentOctant->GetRigidBody()->GetCenterGlobal()));
@@ -285,18 +255,14 @@ void MyOctant::PopulateEntityVector()
 			m_entityManager->GetEntity(i)->AddDimension(totalDimensions);
 		}
 	}
-
-	//std::cout << "\nEntity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
+	std::cout << "Entity Count of octant " << m_dimension << " : " << m_entityVector.size() << "\n";
 }
 
 void MyOctant::Subdivide()
 {
-	//std::cout << "\n\nSubdivide()\n\n";
-
 	for (Simplex::uint i = 0; i < m_MaxSubdivisions; i++)
 	{
-		int childDimension = (m_dimension + 1) + i;
-		m_childrenVector.push_back(new MyOctant(this, i, childDimension, m_divisionLevel + 1, m_totalDivisionLevels));
+		m_childrenVector.push_back(new MyOctant(this, m_centerpointCloud, i, m_divisionLevel + 1, m_totalDivisionLevels));
 
 		// Change color for each octant, for debugging (and it looks neat)
 		m_childrenVector.back()->GetRigidBody()->SetColorColliding(GetNewOctantColor(i + 1));
