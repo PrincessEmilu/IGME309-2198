@@ -241,6 +241,9 @@ void Application::Init(String a_sApplicationName, uint a_uWidth, uint a_uHeight,
 	//Init Mesh Manager
 	m_pMeshMngr = MeshManager::GetInstance();
 
+	// Init BlockGrid
+	m_pBlockGrid = BlockGrid::GetInstance();
+
 	//Init sizes
 	Reshape();
 

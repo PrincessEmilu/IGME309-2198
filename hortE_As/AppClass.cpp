@@ -12,6 +12,8 @@ void Application::InitVariables(void)
 
 	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Steve");
 	m_pEntityMngr->UsePhysicsSolver();
+
+	m_pBlockGrid->GetInstance()->GenerateNewGrid(5);
 	
 	for (int i = 0; i < 100; i++)
 	{
@@ -71,6 +73,9 @@ void Application::Release(void)
 {
 	//Release MyEntityManager
 	MyEntityManager::ReleaseInstance();
+
+	// Release the BlockGrid
+	BlockGrid::ReleaseInstance();
 
 	//release GUI
 	ShutdownGUI();
