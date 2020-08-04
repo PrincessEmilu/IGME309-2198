@@ -5,6 +5,8 @@
 
 #include "Definitions.h"
 
+#include "Block.h"
+
 namespace Simplex
 {
 	class BlockGrid
@@ -22,15 +24,27 @@ namespace Simplex
 		// Creates and initiates a new array of blocks of a given size
 		MyEntity* GenerateNewGrid(uint size);
 
+		// Get the 2D array coordinages of a block from a given vector index
+		std::pair<uint, uint> GetXYPairFromIndex(uint index);
+
+		// Get the vector index for a block at a given coordinate
+		uint GetIndexFromXYPair(std::pair<uint, uint>);
+
 		// Destructor
 		~BlockGrid();
 
 	private:
+		// String for cube model file
+		const std::string m_sModelFile = "Minecraft\\Cube.obj";
+
 		// Instance of the Singleton
 		static BlockGrid* m_instance;
 
+		// Vector containing our grid blocks
+		std::vector<Block*> m_pBlockArray;
+
 		//Dimension of the grid
-		uint m_gridSize;
+		uint m_uGridSize;
 
 		// Private constructor - Needs the size of the grid
 		BlockGrid();
