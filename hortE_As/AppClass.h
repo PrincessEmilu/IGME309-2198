@@ -20,7 +20,7 @@ class Application
 {
 	MyEntityManager* m_pEntityMngr = nullptr; //Entity Manager
 private:
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu"; //programmer
+	String m_sProgrammer = "Emily Horton - eh8582@rit.edu"; //programmer
 
 	static ImGuiObject gui; //GUI object
 	bool m_bGUI_Main = true; //show Main GUI window?
@@ -30,6 +30,8 @@ private:
 
 	uint m_uRenderCallCount = 0; //count of render calls per frame
 	uint m_uControllerCount = 0; //count of controllers connected
+
+	uint m_uGridSize = 50; //The size of the grid to be generated
 
 	bool m_bFocused = true; //is the window focused?
 

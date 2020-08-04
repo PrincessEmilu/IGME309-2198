@@ -13,12 +13,9 @@ void Application::InitVariables(void)
 	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Steve");
 	m_pEntityMngr->UsePhysicsSolver();
 
-	m_pBlockGrid->GenerateNewGrid(5);
+	m_pBlockGrid->GenerateNewGrid(m_uGridSize);
 
-	std::cout << "X,Y of index 11: " << m_pBlockGrid->GetXYPairFromIndex(11).first << ", " << m_pBlockGrid->GetXYPairFromIndex(11).second << std::endl;
-
-	std::cout << "Index of 4,4 : " << m_pBlockGrid->GetIndexFromXYPair(std::pair<uint, uint>(4, 4)) << std::endl;
-	
+	/*
 	for (int i = 0; i < 100; i++)
 	{
 		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Cube_" + std::to_string(i));
@@ -31,6 +28,7 @@ void Application::InitVariables(void)
 
 		//m_pEntityMngr->SetMass(i+1);
 	}
+	*/
 }
 void Application::Update(void)
 {
@@ -48,6 +46,10 @@ void Application::Update(void)
 
 	//Set the model matrix for the main object
 	//m_pEntityMngr->SetModelMatrix(m_m4Steve, "Steve");
+
+		// Render BlockGrid
+	// TODO: Emily move this?
+	m_pBlockGrid->Render();
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);

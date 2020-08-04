@@ -18,6 +18,9 @@ namespace Simplex
 		// Cleans up the instance
 		static void ReleaseInstance();
 
+		// Adds entities to the render list
+		void Render();
+
 		// Returns an ordered path of block IDs
 		std::vector<uint> CalculateAStarPath(std::pair<uint, uint> startBlock, std::pair<uint, uint> endBlock);
 
@@ -45,6 +48,12 @@ namespace Simplex
 
 		//Dimension of the grid
 		uint m_uGridSize;
+
+		// Display rigid body?
+		bool m_bShowRigidBody;
+
+		// Display grid plane?
+		bool m_bShowGridPlane;
 
 		// Private constructor - Needs the size of the grid
 		BlockGrid();

@@ -12,6 +12,8 @@ public:
 
 	std::pair<uint, uint> GetXYIndex();
 
+	void AddToRenderList(bool rigidBodyVisible, bool gridPlaneVisible);
+
 private:
 	// The array position for this block
 	std::pair<uint, uint> m_uXYIndex;

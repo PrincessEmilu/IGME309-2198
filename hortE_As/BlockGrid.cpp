@@ -8,6 +8,9 @@ BlockGrid* BlockGrid::m_instance = nullptr;
 
 BlockGrid::BlockGrid()
 {
+	m_bShowGridPlane = false;
+	m_bShowGridPlane = false;
+
 	std::cout << "BlockGrid()" << std::endl;
 	m_uGridSize = 0;
 	m_pBlockArray = std::vector<Block*>();
@@ -21,6 +24,14 @@ BlockGrid::~BlockGrid()
 	{
 		delete block;
 		block = nullptr;
+	}
+}
+
+void BlockGrid::Render()
+{
+	for (uint i = 0; i < m_pBlockArray.size(); i++)
+	{
+		m_pBlockArray[i]->AddToRenderList(m_bShowGridPlane, m_bShowGridPlane);
 	}
 }
 
@@ -87,6 +98,7 @@ MyEntity* BlockGrid::GenerateNewGrid(uint size)
 		for (uint j = 0; j < m_uGridSize; ++j)
 		{
 			m_pBlockArray.push_back(new Block(std::pair<uint, uint>(j, i), m_sModelFile, "Block"));
+			m_pBlockArray.back()->SetModelMatrix(glm::translate(vector3(i, 0.0f, j)));
 		}
 	}
 
