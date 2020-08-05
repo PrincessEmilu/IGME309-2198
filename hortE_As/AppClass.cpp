@@ -12,6 +12,10 @@ void Application::InitVariables(void)
 
 	m_pEntityMngr->AddEntity("Minecraft\\Steve.obj", "Steve");
 	m_pEntityMngr->UsePhysicsSolver();
+	m_pEntityMngr->AddEntity("Minecraft\\Zombie.obj", "Zombie");
+	m_pEntityMngr->UsePhysicsSolver();
+
+	m_pEntityMngr->SetModelMatrix(glm::translate(vector3(-1.0f, 0.0f, -1.0f)), "Zombie");
 
 	m_pBlockGrid->GenerateNewGrid(m_uGridSize);
 

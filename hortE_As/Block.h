@@ -14,6 +14,10 @@ public:
 
 	void AddToRenderList(bool rigidBodyVisible, bool gridPlaneVisible);
 
+	void SetGridPanelVisible(bool isVisible);
+
+	void SetGridPanelColor(vector3 color);
+
 private:
 	// The array position for this block
 	std::pair<uint, uint> m_uXYIndex;
@@ -23,6 +27,12 @@ private:
 
 	// Weight
 	uint m_uWeight;
+
+	// Draw the top plane?
+	bool m_bGridPlaneVisible;
+
+	// Color to draw the top plane in
+	vector3 m_vPlaneColor;
 };
 }
 #endif // BLOCK_H

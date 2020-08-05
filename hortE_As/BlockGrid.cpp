@@ -8,7 +8,7 @@ BlockGrid* BlockGrid::m_instance = nullptr;
 
 BlockGrid::BlockGrid()
 {
-	m_bShowGridPlane = false;
+	m_bShowRigidBody = false;
 	m_bShowGridPlane = false;
 
 	std::cout << "BlockGrid()" << std::endl;
@@ -31,7 +31,7 @@ void BlockGrid::Render()
 {
 	for (uint i = 0; i < m_pBlockArray.size(); i++)
 	{
-		m_pBlockArray[i]->AddToRenderList(m_bShowGridPlane, m_bShowGridPlane);
+		m_pBlockArray[i]->AddToRenderList(m_bShowRigidBody, m_bShowGridPlane);
 	}
 }
 
@@ -39,12 +39,10 @@ BlockGrid* BlockGrid::GetInstance()
 {
 	if (m_instance)
 	{
-		std::cout << "Instance exists, return it" << std::endl;
 		return m_instance;
 	}
 	else
 	{
-		std::cout << "Create a new instance of BlockGrid" << std::endl;
 		m_instance = new BlockGrid();
 		return m_instance;
 	}
@@ -87,10 +85,9 @@ std::vector<uint> BlockGrid::CalculateAStarPath(std::pair<uint, uint> startBlock
 	return std::vector<uint>();
 }
 
-MyEntity* BlockGrid::GenerateNewGrid(uint size)
+void BlockGrid::GenerateNewGrid(uint size)
 {
 	m_uGridSize = size;
-	std::cout << "Generate a new grid size: " << m_uGridSize << std::endl;
 
 	// Nested for loop fakes creating a real 2D array... don't tell anyone we are cheating!
 	for (uint i = 0; i < m_uGridSize; ++i)
@@ -98,12 +95,11 @@ MyEntity* BlockGrid::GenerateNewGrid(uint size)
 		for (uint j = 0; j < m_uGridSize; ++j)
 		{
 			m_pBlockArray.push_back(new Block(std::pair<uint, uint>(j, i), m_sModelFile, "Block"));
-			m_pBlockArray.back()->SetModelMatrix(glm::translate(vector3(i, 0.0f, j)));
+
+			// Calculate the X and Z such that the grid will be centered at the origin
+			float x = (-1 * ((float)(m_uGridSize) / 2.0f)) + j;
+			float z = (-1 * ((float)(m_uGridSize) / 2.0f)) + i;
+			m_pBlockArray.back()->SetModelMatrix(glm::translate(vector3(x, 0.0f, z)));
 		}
 	}
-
-	std::cout << "Total Blocks Generated: " << m_pBlockArray.size() << std::endl;
-
-
-	return nullptr;
 }

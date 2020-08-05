@@ -25,7 +25,7 @@ namespace Simplex
 		std::vector<uint> CalculateAStarPath(std::pair<uint, uint> startBlock, std::pair<uint, uint> endBlock);
 
 		// Creates and initiates a new array of blocks of a given size
-		MyEntity* GenerateNewGrid(uint size);
+		void GenerateNewGrid(uint size);
 
 		// Get the 2D array coordinages of a block from a given vector index
 		std::pair<uint, uint> GetXYPairFromIndex(uint index);

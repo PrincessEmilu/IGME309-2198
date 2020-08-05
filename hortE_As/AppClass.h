@@ -31,7 +31,7 @@ private:
 	uint m_uRenderCallCount = 0; //count of render calls per frame
 	uint m_uControllerCount = 0; //count of controllers connected
 
-	uint m_uGridSize = 50; //The size of the grid to be generated
+	uint m_uGridSize = 25; //The size of the grid to be generated
 
 	bool m_bFocused = true; //is the window focused?
 
