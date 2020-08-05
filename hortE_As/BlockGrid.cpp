@@ -57,7 +57,7 @@ void BlockGrid::ReleaseInstance()
 	}
 }
 
-uint BlockGrid::GetIndexFromXYPair(std::pair<uint, uint> xyPair)
+uint BlockGrid::GetIndexFromXYPair(UIntPair xyPair)
 {
 	// Calculates the 1D index from a 2D value if it's within range
 	uint index = -1;
@@ -67,10 +67,10 @@ uint BlockGrid::GetIndexFromXYPair(std::pair<uint, uint> xyPair)
 	return index;
 }
 
-std::pair<uint, uint> BlockGrid::GetXYPairFromIndex(uint index)
+UIntPair BlockGrid::GetXYPairFromIndex(uint index)
 {
 	// Calculate the 2D index from a 1D value if it's within range.
-	auto xYPair = std::pair<uint, uint>(-1, -1);
+	auto xYPair = UIntPair(-1, -1);
 	if (index < m_pBlockArray.size())
 	{
 		xYPair.first = index % m_uGridSize;
@@ -80,7 +80,7 @@ std::pair<uint, uint> BlockGrid::GetXYPairFromIndex(uint index)
 	return xYPair;
 }
 
-std::vector<uint> BlockGrid::CalculateAStarPath(std::pair<uint, uint> startBlock, std::pair<uint, uint> endBlock)
+std::vector<uint> BlockGrid::CalculateAStarPath(UIntPair startBlock, UIntPair endBlock)
 {
 	return std::vector<uint>();
 }
@@ -94,12 +94,56 @@ void BlockGrid::GenerateNewGrid(uint size)
 	{
 		for (uint j = 0; j < m_uGridSize; ++j)
 		{
-			m_pBlockArray.push_back(new Block(std::pair<uint, uint>(j, i), m_sModelFile, "Block"));
+			m_pBlockArray.push_back(new Block(UIntPair(j, i), m_sModelFile, "Block"));
 
 			// Calculate the X and Z such that the grid will be centered at the origin
 			float x = (-1 * ((float)(m_uGridSize) / 2.0f)) + j;
 			float z = (-1 * ((float)(m_uGridSize) / 2.0f)) + i;
 			m_pBlockArray.back()->SetModelMatrix(glm::translate(vector3(x, 0.0f, z)));
+
+			// Assign all valid neighbor blocks to this block
+			AssignNeighbors(m_pBlockArray.back());
 		}
 	}
+}
+
+void BlockGrid::AssignNeighbors(Block* block)
+{
+	// "Coordinates" for this block
+	uint x = block->GetXYIndex().first;
+	uint z = block->GetXYIndex().second;
+
+	// EMILY TODO: Remove before submission!
+	uint total = 0;
+
+	// Add Neighbors- four possibilities
+	// Left
+	if (x > 0)
+	{
+		m_pBlockArray.back()->AddToNeighborList(UIntPair(x - 1, z));
+		++total;
+	}
+
+	// Right
+	if (x < m_uGridSize - 1)
+	{
+		m_pBlockArray.back()->AddToNeighborList(UIntPair(x + 1, z));
+		++total;
+	}
+
+	// Above
+	if (z > 0)
+	{
+		m_pBlockArray.back()->AddToNeighborList(UIntPair(x, z - 1));
+		++total;
+	}
+
+	// Below
+	if (z < m_uGridSize - 1)
+	{
+		m_pBlockArray.back()->AddToNeighborList(UIntPair(x, z + 1));
+		++total;
+	}
+
+	std::cout << "Neighbors Added: " << total << std::endl;
 }

@@ -22,16 +22,19 @@ namespace Simplex
 		void Render();
 
 		// Returns an ordered path of block IDs
-		std::vector<uint> CalculateAStarPath(std::pair<uint, uint> startBlock, std::pair<uint, uint> endBlock);
+		std::vector<uint> CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
 
 		// Creates and initiates a new array of blocks of a given size
 		void GenerateNewGrid(uint size);
 
 		// Get the 2D array coordinages of a block from a given vector index
-		std::pair<uint, uint> GetXYPairFromIndex(uint index);
+		UIntPair GetXYPairFromIndex(uint index);
 
 		// Get the vector index for a block at a given coordinate
-		uint GetIndexFromXYPair(std::pair<uint, uint>);
+		uint GetIndexFromXYPair(UIntPair);
+
+		// Assigns all valid neighbors to this block
+		void AssignNeighbors(Block* block);
 
 		// Destructor
 		~BlockGrid();
