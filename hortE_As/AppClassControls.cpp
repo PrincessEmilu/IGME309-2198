@@ -113,6 +113,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		m_pCameraMngr->SetFPS(bFPSControl);
 		break;
 	case sf::Keyboard::PageUp:
+		m_pBlockGrid->CalculateAStarPath(UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1))), UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1))));
 		break;
 	case sf::Keyboard::PageDown:
 		break;

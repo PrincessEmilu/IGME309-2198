@@ -31,7 +31,7 @@ void BlockGrid::Render()
 {
 	for (uint i = 0; i < m_pBlockArray.size(); i++)
 	{
-		m_pBlockArray[i]->AddToRenderList(m_bShowRigidBody, m_bShowGridPlane);
+		m_pBlockArray[i]->AddToRenderList();
 	}
 }
 
@@ -84,7 +84,7 @@ std::vector<Block*> BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPa
 {
 	// The blocks that are the path from start to finish
 	auto pathVector = std::vector<Block*>();
-	auto queue = std::vector<Block*>(); // This is a vector, not a queue. But I like this name better. Please don't take too many points off.
+	auto queue = std::deque<Block*>();
 
 	// Get the blocks for start and end
 	Block* startBlock = m_pBlockArray[GetIndexFromXYPair(a_UStartBlock)];
@@ -111,8 +111,9 @@ std::vector<Block*> BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPa
 	queue.push_back(startBlock);
 
 	// Loop until we have reached the end... I think that's how we do it here?
-	while (currentBlock != endBlock);
+	while (currentBlock != endBlock)
 	{
+		//std::cout << "Current Block Index: " << currentBlock->GetXYIndex().first << ", " << currentBlock->GetXYIndex().second << std::endl;
 		// For each of the current block's neighbors
 		for (auto neighbor : currentBlock->GetNeighborList())
 		{
@@ -131,10 +132,49 @@ std::vector<Block*> BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPa
 		// Every neighbor has been checked, mark the current block as permanent
 		currentBlock->SetPermanent(true);
 
-		// TODO: Set the next current block
+		// Add the front element of the queue to the path vector
+		//pathVector.push_back(queue.front());
+
+		// Remove the current block from the queue
+		queue.pop_front();
+
+		// Add neighbors to the list
+		auto neighborList = currentBlock->GetNeighborList();
+		for (auto neighbor : neighborList)
+		{
+			if (false == neighbor->GetPermanent())
+				queue.push_back(neighbor);
+		}
+
+		// Get the least-cost neighbor and put it in the front
+		// We will just assume that the front is the least-cost and test against that
+		while (queue.front()->GetPermanent())
+		{
+			for (uint i = 1; i < queue.size(); i++)
+			{
+				if ((queue[i]->GetDistanceFromStart() + queue[i]->GetHeuristicCost()) < (queue.front()->GetDistanceFromStart() + queue.front()->GetHeuristicCost()))
+				{
+					std::swap(queue[0], queue[i]);
+				}
+			}
+
+			if (queue.front()->GetPermanent())
+				queue.pop_front();
+		}
+
+		// Set the next current block to the cheapest (first) block in the list
+		currentBlock = queue.front();
 	}
 
+	endBlock->PrintPath();
+	endBlock->SetGridPanelColor(C_GREEN_LIME);
+
 	return pathVector;
+}
+
+void BlockGrid::PutCheapestBlockInFront()
+{
+	int cheapestIndex = 0; // Assume it's the first one
 }
 
 void BlockGrid::GenerateNewGrid(uint size)
@@ -162,7 +202,7 @@ void BlockGrid::GenerateNewGrid(uint size)
 	}
 
 	// TODO: EMILY, remove this!
-	//CalculateAStarPath(UIntPair(0, 0), UIntPair(m_uGridSize - 1, m_uGridSize - 1));
+	CalculateAStarPath(UIntPair(0, 0), UIntPair(2, 20));
 }
 
 void BlockGrid::SetHeuristicCost(Block* goalBlock)
@@ -170,7 +210,6 @@ void BlockGrid::SetHeuristicCost(Block* goalBlock)
 	for (auto block : m_pBlockArray)
 	{
 		block->SetHeuristicCost(glm::distance(goalBlock->GetPosition(), block->GetPosition()));
-		std::cout << "Heuristic Cost: " << block->GetHeuristicCost() << std::endl;
 	}
 }
 
@@ -187,32 +226,32 @@ void BlockGrid::AssignNeighbors(Block* block)
 	// Left
 	if (x > 0)
 	{
-		m_pBlockArray.back()->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x - 1, z))]);
+		block->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x - 1, z))]);
 		++total;
 	}
 
 	// Right
 	if (x < m_uGridSize - 1)
 	{
-		m_pBlockArray.back()->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x + 1, z))]);
+		block->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x + 1, z))]);
 		++total;
 	}
 
 	// Above
 	if (z > 0)
 	{
-		m_pBlockArray.back()->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x, z - 1))]);
+		block->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x, z - 1))]);
 		++total;
 	}
 
 	// Below
 	if (z < m_uGridSize - 1)
 	{
-		m_pBlockArray.back()->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x, z + 1))]);
+		block->AddToNeighborList(m_pBlockArray[GetIndexFromXYPair(UIntPair(x, z + 1))]);
 		++total;
 	}
 
-	std::cout << "Neighbors Added: " << total << std::endl;
+	//std::cout << "Neighbors Added: " << total << std::endl;
 }
 
 void BlockGrid::ResetAllBlocks()

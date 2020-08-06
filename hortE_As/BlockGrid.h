@@ -24,6 +24,9 @@ namespace Simplex
 		// Returns an ordered path of block IDs
 		std::vector<Block*> CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
 
+		// Puts the lowest-costing block at the front of the queue
+		void PutCheapestBlockInFront();
+
 		// Creates and initiates a new array of blocks of a given size
 		void GenerateNewGrid(uint size);
 

@@ -4,7 +4,12 @@ using namespace Simplex;
 Block::Block(UIntPair index, String a_sFileName, String a_sUniqueID) : MyEntity::MyEntity(a_sFileName, a_sUniqueID)
 {
 	m_uXYIndex = index;
-	m_vPlaneColor = C_RED;
+	m_vPlaneColor = C_YELLOW;
+
+	m_bGridPlaneVisible = false;
+
+	// By default, all blocks are weighted the same.
+	m_uWeight = 1;
 
 	ResetAStar();
 }
@@ -19,21 +24,29 @@ Block::~Block()
 
 void Block::ResetAStar()
 {
+	m_vPlaneColor = C_YELLOW;
+	m_bGridPlaneVisible = false;
 	m_bPermanent = false;
 	m_pPreviousBlock = nullptr;
-	m_uDistanceFromStart = 100000000000; // Yes, I could use INT_MAX but a calculation I do can sometimes result in underflow... maybe it's a sign I should do it differently, but this works fine for this scale
+	m_fDistanceFromStart = FLT_MAX;
 	m_fHeuristicCost = 0.0f;
-	m_vNeighborList = std::vector<Block*>();
 }
 
-void Block::AddToRenderList(bool rigidBodyVisible, bool gridPlaneVisible)
+void Block::AddToRenderList()
 {
 	// Render via the base method
-	MyEntity::AddToRenderList(rigidBodyVisible);
+	MyEntity::AddToRenderList(false);
 
 	// Render the top panel if visibility enabled
-	if (gridPlaneVisible)
-		MeshManager::GetInstance()->AddPlaneToRenderList(GetModelMatrix(), C_RED);
+	if (m_bGridPlaneVisible)
+	{
+		matrix4 plane_matrix = GetModelMatrix();
+		plane_matrix = glm::translate(plane_matrix, vector3(0.5f, 1.1f, 0.5f));
+		plane_matrix = glm::rotate(plane_matrix, (float)(PI / -2), AXIS_X);
+		plane_matrix = glm::scale(plane_matrix, vector3(0.5f));
+		MeshManager::GetInstance()->AddPlaneToRenderList(plane_matrix, m_vPlaneColor);
+	}
+		
 }
 
 void Block::AddToNeighborList(Block* newNeigbor)
@@ -76,15 +89,15 @@ bool Simplex::Block::GetPermanent()
 
 void Simplex::Block::UpdateDistanceFromStart()
 {
-	m_uDistanceFromStart = m_uWeight + m_fHeuristicCost;
+	m_fDistanceFromStart = m_uWeight;
 	
 	if (m_pPreviousBlock)
-		m_uDistanceFromStart += m_pPreviousBlock->GetDistanceFromStart();
+		m_fDistanceFromStart += m_pPreviousBlock->GetDistanceFromStart();
 }
 
 uint Simplex::Block::GetDistanceFromStart()
 {
-	return m_uDistanceFromStart;
+	return m_fDistanceFromStart;
 }
 
 void Simplex::Block::SetHeuristicCost(float cost)
@@ -112,6 +125,17 @@ void Simplex::Block::SetGridPanelColor(vector3 color)
 UIntPair Block::GetXYIndex()
 {
 	return m_uXYIndex;
+}
+
+// Print 
+void Block::PrintPath()
+{
+	if (m_pPreviousBlock)
+		m_pPreviousBlock->PrintPath();
+	else
+		m_vPlaneColor = C_BLUE;
+
+	m_bGridPlaneVisible = true;
 }
 
 

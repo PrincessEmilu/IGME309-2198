@@ -22,7 +22,7 @@ public:
 	void ResetAStar();
 
 	// Add this block to the render list
-	void AddToRenderList(bool rigidBodyVisible, bool gridPlaneVisible);
+	void AddToRenderList();
 
 	// Add a new neighbor to the neighbor list
 	void AddToNeighborList(Block* newNeighbor);
@@ -60,6 +60,9 @@ public:
 	// Set the color of the grid panel
 	void SetGridPanelColor(vector3 color);
 
+	// Recursively print the xy pairs
+	void PrintPath();
+
 private:
 	// The array position for this block
 	UIntPair m_uXYIndex;
@@ -74,7 +77,7 @@ private:
 	std::vector<Block*> m_vNeighborList;
 
 	// Total cost to get here
-	uint m_uDistanceFromStart;
+	float m_fDistanceFromStart;
 
 	// Heuristic Cost
 	float m_fHeuristicCost;
