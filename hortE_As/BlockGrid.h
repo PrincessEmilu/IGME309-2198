@@ -22,7 +22,7 @@ namespace Simplex
 		void Render();
 
 		// Returns an ordered path of block IDs
-		std::vector<uint> CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
+		std::vector<Block*> CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
 
 		// Creates and initiates a new array of blocks of a given size
 		void GenerateNewGrid(uint size);
@@ -35,6 +35,12 @@ namespace Simplex
 
 		// Assigns all valid neighbors to this block
 		void AssignNeighbors(Block* block);
+
+		// Sets the heuristic cost for each block based on distance to finish
+		void SetHeuristicCost(Block* goalBlock);
+
+		// Reset each block for a new A* search
+		void ResetAllBlocks();
 
 		// Destructor
 		~BlockGrid();

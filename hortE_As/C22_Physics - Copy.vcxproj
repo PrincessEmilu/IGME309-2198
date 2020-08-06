@@ -125,7 +125,6 @@ xcopy "$(SolutionDir)include\Simplex\Shaders" "$(SolutionDir)_Binary\Shaders" /y
     <ClInclude Include="BlockGrid.h" />
     <ClInclude Include="ControllerConfiguration.h" />
     <ClInclude Include="Definitions.h" />
-    <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="MyEntity.h" />
     <ClInclude Include="MyEntityManager.h" />
     <ClInclude Include="Main.h" />

@@ -110,9 +110,6 @@
     <ClInclude Include="Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PriorityQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\res\BTO.rc">
