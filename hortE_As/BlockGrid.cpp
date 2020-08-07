@@ -67,6 +67,17 @@ uint BlockGrid::GetIndexFromXYPair(UIntPair xyPair)
 	return index;
 }
 
+UIntPair Simplex::BlockGrid::GetCollidingBlock(MyEntity* targetEntity)
+{
+	for (auto block : m_pBlockArray)
+	{
+		if (block->IsColliding(targetEntity))
+			return block->GetXYIndex();
+	}
+
+	return UIntPair(0, 0);
+}
+
 UIntPair BlockGrid::GetXYPairFromIndex(uint index)
 {
 	// Calculate the 2D index from a 1D value if it's within range.
@@ -80,10 +91,9 @@ UIntPair BlockGrid::GetXYPairFromIndex(uint index)
 	return xYPair;
 }
 
-std::vector<Block*> BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
+void BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
 {
-	// The blocks that are the path from start to finish
-	auto pathVector = std::vector<Block*>();
+	// The queue of blocks that need to be traversed
 	auto queue = std::deque<Block*>();
 
 	// Get the blocks for start and end
@@ -168,8 +178,6 @@ std::vector<Block*> BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPa
 
 	endBlock->PrintPath();
 	endBlock->SetGridPanelColor(C_GREEN_LIME);
-
-	return pathVector;
 }
 
 void BlockGrid::PutCheapestBlockInFront()
@@ -191,7 +199,7 @@ void BlockGrid::GenerateNewGrid(uint size)
 			// Calculate the X and Z such that the grid will be centered at the origin
 			float x = (-1 * ((float)(m_uGridSize) / 2.0f)) + j;
 			float z = (-1 * ((float)(m_uGridSize) / 2.0f)) + i;
-			m_pBlockArray.back()->SetModelMatrix(glm::translate(vector3(x, 0.0f, z)));
+			m_pBlockArray.back()->SetModelMatrix(glm::translate(vector3(x, -1.0f, z)));
 		}
 	}
 
@@ -200,9 +208,6 @@ void BlockGrid::GenerateNewGrid(uint size)
 	{
 		AssignNeighbors(block);
 	}
-
-	// TODO: EMILY, remove this!
-	CalculateAStarPath(UIntPair(0, 0), UIntPair(2, 20));
 }
 
 void BlockGrid::SetHeuristicCost(Block* goalBlock)

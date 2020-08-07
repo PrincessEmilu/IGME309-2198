@@ -22,7 +22,7 @@ namespace Simplex
 		void Render();
 
 		// Returns an ordered path of block IDs
-		std::vector<Block*> CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
+		void CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
 
 		// Puts the lowest-costing block at the front of the queue
 		void PutCheapestBlockInFront();
@@ -35,6 +35,8 @@ namespace Simplex
 
 		// Get the vector index for a block at a given coordinate
 		uint GetIndexFromXYPair(UIntPair);
+
+		UIntPair GetCollidingBlock(MyEntity* targetEntity);
 
 		// Assigns all valid neighbors to this block
 		void AssignNeighbors(Block* block);

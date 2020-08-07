@@ -113,7 +113,8 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		m_pCameraMngr->SetFPS(bFPSControl);
 		break;
 	case sf::Keyboard::PageUp:
-		m_pBlockGrid->CalculateAStarPath(UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1))), UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1))));
+		m_uStartBlockCoords = UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1)));
+		m_uEndBlockCoords = UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1)));
 		break;
 	case sf::Keyboard::PageDown:
 		break;
@@ -417,22 +418,22 @@ void Application::ProcessKeyboard(void)
 	float fDelta = m_pSystem->GetDeltaTime(0);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		m_pEntityMngr->ApplyForce(vector3(-2.0f * fDelta, 0.0f, 0.0f), "Steve");
+		m_pEntityMngr->ApplyForce(vector3(-1.0f * fDelta, 0.0f, 0.0f), "Steve");
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		m_pEntityMngr->ApplyForce(vector3(2.0f * fDelta, 0.0f, 0.0f), "Steve");
+		m_pEntityMngr->ApplyForce(vector3(1.0f * fDelta, 0.0f, 0.0f), "Steve");
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, -2.0f * fDelta), "Steve");
+		m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, -1.0f * fDelta), "Steve");
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, 2.0f * fDelta), "Steve");
+		m_pEntityMngr->ApplyForce(vector3(0.0f, 0.0f, 1.0f * fDelta), "Steve");
 	}
 #pragma endregion
 }

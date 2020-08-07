@@ -5,6 +5,12 @@ void Application::InitVariables(void)
 	// Seed the random number generator
 	srand(time(0));
 
+	// Set default start and end block coordinates
+	m_uStartBlockCoords = UIntPair(0, 0);
+	m_uEndBlockCoords = UIntPair(m_uGridSize - 1, m_uGridSize - 1);
+	m_uPreviousStartCoords = m_uStartBlockCoords;
+	m_uPreviousEndCoords = m_uEndBlockCoords;
+
 	//Set the position and target of the camera
 	m_pCameraMngr->SetPositionTargetAndUpward(
 		vector3(0.0f, 5.0f, 25.0f), //Position
@@ -51,16 +57,24 @@ void Application::Update(void)
 	//Update Entity Manager
 	m_pEntityMngr->Update();
 
-	//Set the model matrix for the main object
-	//m_pEntityMngr->SetModelMatrix(m_m4Steve, "Steve");
+	// Get a new end block (where the movable character is)
+	UIntPair newEndBlockCoords = m_pBlockGrid->GetCollidingBlock(m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Steve")));
+	if (newEndBlockCoords != m_uEndBlockCoords)
+	{
+		m_uEndBlockCoords = newEndBlockCoords;
+		m_uStartBlockCoords = m_pBlockGrid->GetCollidingBlock(m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Zombie")));
+	}
 
-		// Render BlockGrid
-	// TODO: Emily move this?
-	m_pBlockGrid->Render();
+	// Calculate A* if necesary
+	if (m_uEndBlockCoords != m_uPreviousEndCoords)
+	{
+		m_pBlockGrid->CalculateAStarPath(m_uStartBlockCoords, m_uEndBlockCoords);
+		m_uPreviousStartCoords = m_uStartBlockCoords;
+		m_uPreviousEndCoords = m_uEndBlockCoords;
+	}
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
-	//m_pEntityMngr->AddEntityToRenderList(-1, true);
 }
 void Application::Display(void)
 {
@@ -69,6 +83,9 @@ void Application::Display(void)
 
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
+
+	// Render BlockGrid
+	m_pBlockGrid->Render();
 
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();

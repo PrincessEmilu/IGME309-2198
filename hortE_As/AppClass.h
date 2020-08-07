@@ -32,6 +32,10 @@ private:
 	uint m_uControllerCount = 0; //count of controllers connected
 
 	uint m_uGridSize = 25; //The size of the grid to be generated
+	UIntPair m_uStartBlockCoords; // The start block x/y pair
+	UIntPair m_uEndBlockCoords; // The end block x/y pair
+	UIntPair m_uPreviousStartCoords; // The last start block
+	UIntPair m_uPreviousEndCoords; // The previous start block
 
 	bool m_bFocused = true; //is the window focused?
 

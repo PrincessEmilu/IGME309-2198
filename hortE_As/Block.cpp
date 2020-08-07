@@ -11,6 +11,10 @@ Block::Block(UIntPair index, String a_sFileName, String a_sUniqueID) : MyEntity:
 	// By default, all blocks are weighted the same.
 	m_uWeight = 1;
 
+	// DEBUG ONLY, EMILY REMOVE THIS
+	if (m_uXYIndex.first % 3 == 0)
+		m_uWeight = 5;
+
 	ResetAStar();
 }
 
