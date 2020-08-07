@@ -11,10 +11,6 @@ Block::Block(UIntPair index, String a_sFileName, String a_sUniqueID) : MyEntity:
 	// By default, all blocks are weighted the same.
 	m_uWeight = 1;
 
-	// DEBUG ONLY, EMILY REMOVE THIS
-	if (m_uXYIndex.first % 3 == 0)
-		m_uWeight = 5;
-
 	ResetAStar();
 }
 
@@ -39,7 +35,8 @@ void Block::ResetAStar()
 void Block::AddToRenderList()
 {
 	// Render via the base method
-	MyEntity::AddToRenderList(false);
+	// Render the rigidbody if the block has been weighted
+	MyEntity::AddToRenderList(m_uWeight == 50);
 
 	// Render the top panel if visibility enabled
 	if (m_bGridPlaneVisible)
@@ -104,6 +101,11 @@ uint Simplex::Block::GetDistanceFromStart()
 	return m_fDistanceFromStart;
 }
 
+void Simplex::Block::SetWeight(uint weight)
+{
+	m_uWeight = weight;
+}
+
 void Simplex::Block::SetHeuristicCost(float cost)
 {
 	if (cost >= 0.0f)
@@ -112,6 +114,10 @@ void Simplex::Block::SetHeuristicCost(float cost)
 float Simplex::Block::GetHeuristicCost()
 {
 	return m_fHeuristicCost;
+}
+float Simplex::Block::GetDistancePlusHeuristic()
+{
+	return m_fDistanceFromStart + m_fHeuristicCost;
 }
 // Set visibility of the plane drawn on top of block for pathfinding info
 void Simplex::Block::SetGridPanelVisible(bool isVisible)
@@ -132,6 +138,7 @@ UIntPair Block::GetXYIndex()
 }
 
 // Print 
+// EMILY TODO: Convert this function into a mechanism for obtaining the path for the zombie to follow!
 void Block::PrintPath()
 {
 	if (m_pPreviousBlock)

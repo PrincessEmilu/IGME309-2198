@@ -34,7 +34,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "glm_dummy::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-glm_dummy-Debug-8a93169f3cbb78997488.json",
+					"jsonFile" : "target-glm_dummy-Debug-7f1b1bbc5be21ea10b55.json",
 					"name" : "glm_dummy",
 					"projectIndex" : 0
 				}
@@ -44,8 +44,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug",
-		"source" : "D:/rit/summer2020/dsa2/class repo/include/glm"
+		"build" : "C:/Users/emily/source/repos/IGME309-2198/include/glm/out/build/x64-Debug",
+		"source" : "C:/Users/emily/source/repos/IGME309-2198/include/glm"
 	},
 	"version" : 
 	{

@@ -31,11 +31,14 @@ private:
 	uint m_uRenderCallCount = 0; //count of render calls per frame
 	uint m_uControllerCount = 0; //count of controllers connected
 
-	uint m_uGridSize = 25; //The size of the grid to be generated
+	uint m_uGridSize = 25; // The size of the grid to be generated
+	uint m_uTotalObstacles; // The total obstacles to spawn
+	std::vector<MyEntity*> m_vObstacles;
 	UIntPair m_uStartBlockCoords; // The start block x/y pair
 	UIntPair m_uEndBlockCoords; // The end block x/y pair
 	UIntPair m_uPreviousStartCoords; // The last start block
 	UIntPair m_uPreviousEndCoords; // The previous start block
+	std::vector<vector3> m_vPathPositions; // The positions of the last-calculated A* path
 
 	bool m_bFocused = true; //is the window focused?
 
@@ -316,6 +319,11 @@ private:
 	OUTPUT: ---
 	*/
 	void NewFrame(void);
+#pragma endregion
+
+#pragma region A Star Project
+	void AddObstacle();
+	void RemoveObstacle();
 #pragma endregion
 
 #pragma region The Rule of Three

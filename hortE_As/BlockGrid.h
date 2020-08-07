@@ -7,6 +7,8 @@
 
 #include "Block.h"
 
+#include "MyEntityManager.h"
+
 namespace Simplex
 {
 	class BlockGrid
@@ -37,6 +39,8 @@ namespace Simplex
 		uint GetIndexFromXYPair(UIntPair);
 
 		UIntPair GetCollidingBlock(MyEntity* targetEntity);
+
+		void SetBlockWeights(std::vector<MyEntity*> obstacleVector);
 
 		// Assigns all valid neighbors to this block
 		void AssignNeighbors(Block* block);

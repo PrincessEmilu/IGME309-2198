@@ -119,8 +119,11 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 	case sf::Keyboard::PageDown:
 		break;
 	case sf::Keyboard::Add:
+		AddObstacle();
 		break;
 	case sf::Keyboard::Subtract:
+	case sf::Keyboard::M:
+		RemoveObstacle();
 		break;
 	case sf::Keyboard::LShift:
 	case sf::Keyboard::RShift:

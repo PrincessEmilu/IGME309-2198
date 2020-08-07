@@ -48,11 +48,16 @@ public:
 	// Gets the total path cost
 	uint GetDistanceFromStart();
 
+	// Set the weigth of this block
+	void SetWeight(uint weight);
+
 	// Set the heuristics cost
 	void SetHeuristicCost(float cost);
 
 	// Returns the heuristic cost
 	float GetHeuristicCost();
+
+	float GetDistancePlusHeuristic();
 
 	// Set visibility of the grid panel
 	void SetGridPanelVisible(bool isVisible);

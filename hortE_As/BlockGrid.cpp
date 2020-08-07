@@ -1,5 +1,6 @@
 #include "BlockGrid.h"
 #include "Definitions.h"
+#include "MyEntityManager.h"
 
 using namespace Simplex;
 
@@ -106,9 +107,6 @@ void BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
 	// Reset all blocks' A* values
 	ResetAllBlocks();
 
-	// TODO: Calculate a weight for the blocks, somehow?
-	//SetBlockWeight();
-
 	//Assign all blocks' Heuristic Costs
 	SetHeuristicCost(endBlock);
 
@@ -120,14 +118,13 @@ void BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
 	// The starting block is the first block to check
 	queue.push_back(startBlock);
 
-	// Loop until we have reached the end... I think that's how we do it here?
+	// Loop until we have reached the end
 	while (currentBlock != endBlock)
 	{
-		//std::cout << "Current Block Index: " << currentBlock->GetXYIndex().first << ", " << currentBlock->GetXYIndex().second << std::endl;
-		// For each of the current block's neighbors
+		// We must check each neighbor block...
 		for (auto neighbor : currentBlock->GetNeighborList())
 		{
-			// Only work on non-permanent blocks
+			// ...but the neighbor blocks should NOT be marked as permanenet
 			if (false == neighbor->GetPermanent())
 			{
 				// Set the neighbor's previous block to the current block if the current one yields a shorter path.
@@ -141,9 +138,6 @@ void BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
 
 		// Every neighbor has been checked, mark the current block as permanent
 		currentBlock->SetPermanent(true);
-
-		// Add the front element of the queue to the path vector
-		//pathVector.push_back(queue.front());
 
 		// Remove the current block from the queue
 		queue.pop_front();
@@ -162,12 +156,13 @@ void BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
 		{
 			for (uint i = 1; i < queue.size(); i++)
 			{
-				if ((queue[i]->GetDistanceFromStart() + queue[i]->GetHeuristicCost()) < (queue.front()->GetDistanceFromStart() + queue.front()->GetHeuristicCost()))
+				if (queue[i]->GetDistancePlusHeuristic() < queue.front()->GetDistancePlusHeuristic())
 				{
 					std::swap(queue[0], queue[i]);
 				}
 			}
 
+			// Make sure that the front is a non-permanent block
 			if (queue.front()->GetPermanent())
 				queue.pop_front();
 		}
@@ -215,6 +210,26 @@ void BlockGrid::SetHeuristicCost(Block* goalBlock)
 	for (auto block : m_pBlockArray)
 	{
 		block->SetHeuristicCost(glm::distance(goalBlock->GetPosition(), block->GetPosition()));
+	}
+}
+
+void BlockGrid::SetBlockWeights(std::vector<MyEntity*> obstacleVector)
+{
+	MyEntityManager* entityManager = MyEntityManager::GetInstance();
+	for (auto block : m_pBlockArray)
+	{
+		// Reset to the block by defult
+		block->ClearCollisionList();
+		block->SetWeight(1);
+
+		for (uint i = 0; i < obstacleVector.size(); i++)
+		{
+			if (block->IsColliding(obstacleVector[i]))
+			{
+				block->SetWeight(50);
+				i = obstacleVector.size(); // All that matters really is if the block has an obstacle. Multiple don't make increase the weight
+			}
+		}
 	}
 }
 

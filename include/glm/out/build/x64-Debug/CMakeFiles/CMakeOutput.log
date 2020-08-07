@@ -1,16 +1,16 @@
 The system is: Windows - 10.0.18362 - AMD64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
-Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.25.28610/bin/HostX64/x64/cl.exe 
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.23.28105/bin/HostX64/x64/cl.exe 
 Build flags: 
 Id flags:  
 
 The output was:
 0
-Microsoft (R) C/C++ Optimizing Compiler Version 19.25.28614 for x64
+Microsoft (R) C/C++ Optimizing Compiler Version 19.23.28107 for x64
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
 CMakeCCompilerId.c
-Microsoft (R) Incremental Linker Version 14.25.28614.0
+Microsoft (R) Incremental Linker Version 14.23.28107.0
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
 /out:CMakeCCompilerId.exe 
@@ -21,20 +21,20 @@ Compilation of the C compiler identification source "CMakeCCompilerId.c" produce
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.obj"
 
-The C compiler identification is MSVC, found in "D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/3.16.19112601-MSVC_2/CompilerIdC/CMakeCCompilerId.exe"
+The C compiler identification is MSVC, found in "C:/Users/emily/source/repos/IGME309-2198/include/glm/out/build/x64-Debug/CMakeFiles/3.15.19080502-MSVC_2/CompilerIdC/CMakeCCompilerId.exe"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
-Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.25.28610/bin/HostX64/x64/cl.exe 
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.23.28105/bin/HostX64/x64/cl.exe 
 Build flags: 
 Id flags:  
 
 The output was:
 0
-Microsoft (R) C/C++ Optimizing Compiler Version 19.25.28614 for x64
+Microsoft (R) C/C++ Optimizing Compiler Version 19.23.28107 for x64
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
 CMakeCXXCompilerId.cpp
-Microsoft (R) Incremental Linker Version 14.25.28614.0
+Microsoft (R) Incremental Linker Version 14.23.28107.0
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
 /out:CMakeCXXCompilerId.exe 
@@ -45,37 +45,37 @@ Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" p
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.obj"
 
-The CXX compiler identification is MSVC, found in "D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/3.16.19112601-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.exe"
+The CXX compiler identification is MSVC, found in "C:/Users/emily/source/repos/IGME309-2198/include/glm/out/build/x64-Debug/CMakeFiles/3.15.19080502-MSVC_2/CompilerIdCXX/CMakeCXXCompilerId.exe"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/emily/source/repos/IGME309-2198/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_9b630 && [1/2] Building C object CMakeFiles\cmTC_9b630.dir\testCCompiler.c.obj
-[2/2] Linking C executable cmTC_9b630.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_fef90 && [1/2] Building C object CMakeFiles\cmTC_fef90.dir\testCCompiler.c.obj
+[2/2] Linking C executable cmTC_fef90.exe
 
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/emily/source/repos/IGME309-2198/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_0eeda && [1/2] Building C object CMakeFiles\cmTC_0eeda.dir\CMakeCCompilerABI.c.obj
-[2/2] Linking C executable cmTC_0eeda.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_de972 && [1/2] Building C object CMakeFiles\cmTC_de972.dir\CMakeCCompilerABI.c.obj
+[2/2] Linking C executable cmTC_de972.exe
 
 
 
 Determining if the CXX compiler works passed with the following output:
-Change Dir: D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/emily/source/repos/IGME309-2198/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_467e4 && [1/2] Building CXX object CMakeFiles\cmTC_467e4.dir\testCXXCompiler.cxx.obj
-[2/2] Linking CXX executable cmTC_467e4.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_48f85 && [1/2] Building CXX object CMakeFiles\cmTC_48f85.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_48f85.exe
 
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: D:/rit/summer2020/dsa2/class repo/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
+Change Dir: C:/Users/emily/source/repos/IGME309-2198/include/glm/out/build/x64-Debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_054c3 && [1/2] Building CXX object CMakeFiles\cmTC_054c3.dir\CMakeCXXCompilerABI.cpp.obj
-[2/2] Linking CXX executable cmTC_054c3.exe
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_95002 && [1/2] Building CXX object CMakeFiles\cmTC_95002.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_95002.exe
 
 
 
