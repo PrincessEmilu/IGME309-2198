@@ -87,7 +87,7 @@ void Application::Update(void)
 	// Calculate A* if necesary
 	if (m_uEndBlockCoords != m_uPreviousEndCoords)
 	{
-		m_pBlockGrid->SetBlockWeights(m_vObstacles);
+		m_pBlockGrid->SetAllBlockWeights(m_vObstacles);
 		m_pBlockGrid->CalculateAStarPath(m_uStartBlockCoords, m_uEndBlockCoords);
 		m_uPreviousStartCoords = m_uStartBlockCoords;
 		m_uPreviousEndCoords = m_uEndBlockCoords;

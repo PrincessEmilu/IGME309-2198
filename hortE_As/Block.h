@@ -15,8 +15,8 @@ public:
 	// Destructor
 	~Block();
 
-	// Returns the XY pair representing where this block is
-	UIntPair GetXYIndex();
+	// Returns the XZ pair representing where this block is
+	UIntPair GetXZIndex();
 
 	// Reset all AStar values
 	void ResetAStar();
@@ -49,28 +49,36 @@ public:
 	uint GetDistanceFromStart();
 
 	// Set the weigth of this block
-	void SetWeight(uint weight);
+	void SetWeight(bool hasObstacle);
 
-	// Set the heuristics cost
+	// Set the heuristic cost
 	void SetHeuristicCost(float cost);
 
-	// Returns the heuristic cost
-	float GetHeuristicCost();
-
+	// Returns the Distance from start + heuristic cost
 	float GetDistancePlusHeuristic();
 
 	// Set visibility of the grid panel
-	void SetGridPanelVisible(bool isVisible);
+	void SetBlockPlaneVisible(bool isVisible);
 
 	// Set the color of the grid panel
-	void SetGridPanelColor(vector3 color);
+	void SetBlockPlaneColor(vector3 color);
 
 	// Recursively print the xy pairs
-	void PrintPath();
+	std::vector<UIntPair> GetCalculatedPath();
+
+	// Constants
+	// Weight values
+	const uint m_uDefaultWeight = 1; // No obstacle
+	const uint m_uObstacleWeight = 50; // Has obstacles
+
+	// Plane colors
+	const vector3 m_vStartPlaneColor = C_BLUE;
+	const vector3 m_vEndPlaneColor = C_GREEN;
+	const vector3 m_vPathPlaneColor = C_YELLOW;
 
 private:
 	// The array position for this block
-	UIntPair m_uXYIndex;
+	UIntPair m_uXZIndex;
 
 	// Is this block marked permanent for the A* search?
 	bool m_bPermanent;
@@ -78,7 +86,7 @@ private:
 	// The previous block on this one's path
 	Block* m_pPreviousBlock;
 
-	// Containts the block's neighbors
+	// Contains the block's neighbors
 	std::vector<Block*> m_vNeighborList;
 
 	// Total cost to get here
@@ -91,11 +99,10 @@ private:
 	uint m_uWeight;
 
 	// Should the top plane be visible
-	bool m_bGridPlaneVisible;
+	bool m_BlockPlaneVisible;
 
 	// Color to draw the top plane in
-	vector3 m_vPlaneColor;
-
+	vector3 m_vCurrentPlaneColor;
 };
 }
 #endif // BLOCK_H
