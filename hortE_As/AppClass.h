@@ -33,6 +33,7 @@ private:
 	uint m_uControllerCount = 0; //count of controllers connected
 
 	uint m_uGridSize = 25; // The size of the grid to be generated
+	const uint m_uMaxObstacles = 30;
 	uint m_uTotalObstacles; // The total obstacles to spawn
 	std::vector<MyEntity*> m_vObstacles;
 	UIntPair m_uStartBlockCoords; // The start block x/y pair
@@ -324,7 +325,10 @@ private:
 #pragma endregion
 
 #pragma region A Star Project
-	// Adds a new obstacle to the grid
+	// Generates an obstacle
+	void GenerateObstacle();
+
+	// Adds a new obstacle to the scene
 	void AddObstacle();
 
 	// Removes an obstacle from the grid

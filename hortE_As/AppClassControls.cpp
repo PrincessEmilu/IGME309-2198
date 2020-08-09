@@ -113,12 +113,11 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		m_pCameraMngr->SetFPS(bFPSControl);
 		break;
 	case sf::Keyboard::PageUp:
-		m_uStartBlockCoords = UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1)));
-		m_uEndBlockCoords = UIntPair(glm::linearRand(0, (int)(m_uGridSize - 1)), glm::linearRand(0, (int)(m_uGridSize - 1)));
 		break;
 	case sf::Keyboard::PageDown:
 		break;
 	case sf::Keyboard::Add:
+	case sf::Keyboard::N:
 		AddObstacle();
 		break;
 	case sf::Keyboard::Subtract:

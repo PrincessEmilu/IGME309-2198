@@ -8,6 +8,8 @@ Simplex::Zombie::Zombie(String a_sFileName, String a_sUniqueID) : MyEntity(a_sFi
 {
 	m_iNextPathPositionIndex = -1; // Set to invalid so that it doesn't try moving while there's no path
 	m_vPathPositions = std::vector<vector3>();
+
+	SetModelMatrix(glm::scale(vector3(0.2f, 1.0f, 0.2f)));
 }
 
 void Simplex::Zombie::MoveZombie()
@@ -44,5 +46,5 @@ void Simplex::Zombie::MoveZombie()
 void Simplex::Zombie::SetPositionsVector(std::vector<vector3> positionsVector)
 {
 	m_vPathPositions = positionsVector;
-	m_iNextPathPositionIndex = 1;
+	m_iNextPathPositionIndex = 0;
 }

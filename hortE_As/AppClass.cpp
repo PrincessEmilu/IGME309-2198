@@ -12,7 +12,7 @@ void Application::InitVariables(void)
 	m_uPreviousEndCoords = m_uEndBlockCoords;
 
 	// Init obstacle collection
-	m_uTotalObstacles = 30;
+	m_uTotalObstacles = 0;
 	m_vObstacles = std::vector<MyEntity*>();
 
 	//Set the position and target of the camera
@@ -36,25 +36,34 @@ void Application::InitVariables(void)
 	m_pBlockGrid->GenerateNewGrid(m_uGridSize);
 
 	// Generate obstacles onto the grid
-	for (int i = 0; i < m_uTotalObstacles; i++)
-	{
-		m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Cube_" + std::to_string(i));
-		vector3 v3Position = vector3(glm::sphericalRand(12.0f));
-		v3Position.y = 0.0f;
-		matrix4 m4Position = glm::translate(v3Position);
-		m_pEntityMngr->SetModelMatrix(m4Position * glm::scale(vector3(0.75f)));
-		m_pEntityMngr->UsePhysicsSolver();
-		m_vObstacles.push_back(m_pEntityMngr->GetEntity(-1));
-	}
+	for (int i = 0; i < m_uMaxObstacles / 2; i++)
+		GenerateObstacle();
 }
 
+void Application::GenerateObstacle()
+{
+	m_pEntityMngr->AddEntity("Minecraft\\Cube.obj", "Cube_" + std::to_string(m_uTotalObstacles));
+	vector3 v3Position = vector3(glm::sphericalRand(12.0f));
+	v3Position.y = 0.0f;
+	matrix4 m4Position = glm::translate(v3Position);
+	m_pEntityMngr->SetModelMatrix(m4Position * glm::scale(vector3(0.75f)));
+	m_pEntityMngr->UsePhysicsSolver();
+	m_vObstacles.push_back(m_pEntityMngr->GetEntity(-1));
+	m_uTotalObstacles++;
+}
 void Application::AddObstacle()
 {
+	// Can't have too many
+	if (m_uTotalObstacles == 30)
+		return;
 
+	//Create a new obstacle
+	GenerateObstacle();
 }
 
 void Application::RemoveObstacle()
 {
+	// Can't have negative obstacles
 	if (m_uTotalObstacles == 0)
 		return;
 
