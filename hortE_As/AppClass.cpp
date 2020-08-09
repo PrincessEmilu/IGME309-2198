@@ -18,6 +18,9 @@ void Application::InitVariables(void)
 	// Init empty path
 	m_vPathPositions = std::vector<vector3>();
 
+	// Default "next" position for zombie
+	m_iNextZombiePositionIndex = -1;
+
 	//Set the position and target of the camera
 	m_pCameraMngr->SetPositionTargetAndUpward(
 		vector3(0.0f, 5.0f, 25.0f), //Position
@@ -32,6 +35,7 @@ void Application::InitVariables(void)
 	m_pEntityMngr->UsePhysicsSolver();
 
 	m_pEntityMngr->SetModelMatrix(glm::translate(vector3(-1.0f, 0.0f, -1.0f)), "Zombie");
+	m_pEntityMngr->SetModelMatrix(glm::scale(vector3(0.5f, 0.5f, 0.5f)));
 
 	m_pBlockGrid->GenerateNewGrid(m_uGridSize);
 
@@ -62,6 +66,27 @@ void Application::RemoveObstacle()
 	m_vObstacles.pop_back();
 }
 
+void Application::MoveZombie()
+{
+	// If there are no positions or the path is complete, return
+	if (m_iNextZombiePositionIndex == -1 || m_iNextZombiePositionIndex == m_vPathPositions.size())
+		return;
+
+	// TODO: LERP the zombie to the next block - but not toward the Y of that block
+	vector3 start = m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Zombie"))->GetPosition();
+	float endX = m_vPathPositions[m_iNextZombiePositionIndex].x;
+	float endY = start.y;
+	float endZ = m_vPathPositions[m_iNextZombiePositionIndex].z;
+	vector3 end = vector3(endX, endY, endZ);
+	vector3 position = glm::lerp(start, end, 0.2f);
+	matrix4 mat4 = glm::translate(IDENTITY_M4, position);
+	m_pEntityMngr->SetModelMatrix(mat4, "Zombie");
+
+	// Go to next block if arived at the current target
+	if (glm::distance(m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Zombie"))->GetPosition(), end) < 0.001f)
+		++m_iNextZombiePositionIndex;
+}
+
 void Application::Update(void)
 {
 	//Update the system so it knows how much time has passed since the last call
@@ -76,6 +101,9 @@ void Application::Update(void)
 	//Update Entity Manager
 	m_pEntityMngr->Update();
 
+	// Move the zombie to the next spot on the path
+	MoveZombie();
+
 	// Get a new end block (where the movable character is)
 	UIntPair newEndBlockCoords = m_pBlockGrid->GetCollidingBlock(m_pEntityMngr->GetEntity(m_pEntityMngr->GetEntityIndex("Steve")));
 	if (newEndBlockCoords != m_uEndBlockCoords)
@@ -87,10 +115,17 @@ void Application::Update(void)
 	// Calculate A* if necesary
 	if (m_uEndBlockCoords != m_uPreviousEndCoords)
 	{
+		// Reset various values
+		m_vPathPositions.clear();
+		m_iNextZombiePositionIndex = 0;
 		m_pBlockGrid->SetAllBlockWeights(m_vObstacles);
-		m_pBlockGrid->CalculateAStarPath(m_uStartBlockCoords, m_uEndBlockCoords);
 		m_uPreviousStartCoords = m_uStartBlockCoords;
 		m_uPreviousEndCoords = m_uEndBlockCoords;
+
+		// Get the path by running A* and get positions for the zombie to follow
+		auto pathVector = m_pBlockGrid->CalculateAStarPath(m_uStartBlockCoords, m_uEndBlockCoords);
+		for (uint i = 0; i < pathVector.size(); ++i)
+			m_vPathPositions.push_back(m_pBlockGrid->GetBlockWorldPosition(pathVector[i]));
 	}
 
 	//Add objects to render list

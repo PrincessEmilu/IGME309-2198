@@ -40,6 +40,9 @@ private:
 	UIntPair m_uPreviousEndCoords; // The previous start block
 	std::vector<vector3> m_vPathPositions; // The positions of the last-calculated A* path
 
+	int m_iNextZombiePositionIndex;
+	void MoveZombie();
+
 	bool m_bFocused = true; //is the window focused?
 
 	float m_fMovementSpeed = 0.1f; //how fast the camera will move

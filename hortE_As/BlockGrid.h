@@ -23,7 +23,10 @@ namespace Simplex
 		void Render();
 
 		// Returns an ordered path of block IDs
-		void CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
+		std::vector<UIntPair> CalculateAStarPath(UIntPair startBlock, UIntPair endBlock);
+
+		// Get the world position for a given block given the XZ pair
+		vector3 GetBlockWorldPosition(UIntPair index);
 
 		// Creates and initiates a new array of blocks of a given size
 		void GenerateNewGrid(uint size);

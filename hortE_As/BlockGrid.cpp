@@ -88,7 +88,17 @@ UIntPair BlockGrid::GetXZPairFromIndex(uint index)
 	return xZPair;
 }
 
-void BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
+vector3 BlockGrid::GetBlockWorldPosition(UIntPair coordinates)
+{
+	// Get the vector index, then get the position from that vector
+	auto position = m_vBlockVector[GetIndexFromXZPair(coordinates)]->GetPosition();
+	position.x += 0.5f;
+	position.z += 0.5f;
+
+	return position;
+}
+
+std::vector<UIntPair> BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
 {
 	// The queue of blocks that need to be traversed
 	auto queue = std::deque<Block*>();
@@ -167,8 +177,8 @@ void BlockGrid::CalculateAStarPath(UIntPair a_UStartBlock, UIntPair a_uEndBlock)
 		currentBlock = queue.front();
 	}
 
-	auto path = endBlock->GetCalculatedPath();
 	endBlock->SetBlockPlaneColor(C_GREEN_LIME);
+	return endBlock->GetCalculatedPath();
 }
 
 void BlockGrid::GenerateNewGrid(uint size)

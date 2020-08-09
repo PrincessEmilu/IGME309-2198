@@ -26,7 +26,7 @@ Block::~Block()
 	for (auto neighbor : m_vNeighborList)
 	{
 		neighbor = nullptr;
-	 }
+	}
 }
 
 void Block::ResetAStar()
