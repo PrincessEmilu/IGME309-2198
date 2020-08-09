@@ -38,6 +38,7 @@ void Application::DrawGUI(void)
 			ImGui::TextColored(v4Color, m_sProgrammer.c_str());
 			ImGui::Text("FrameRate: %.2f [FPS] -> %.3f [ms/frame]\n",
 				ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+			ImGui::Text("Total Obstacles: %i", m_uTotalObstacles);
 			ImGui::Separator();
 			ImGui::Text("Control:\n");
 			ImGui::Text("   WASD: Movement\n");
@@ -47,6 +48,8 @@ void Application::DrawGUI(void)
 			ImGui::Text("	 F4: Orthographic Z\n");
 			ImGui::Separator();
 			ImGui::Text("Arrows: Apply force to Steve\n");
+			ImGui::Text("+ / N: Add Obstacle\n");
+			ImGui::Text("- / M: Remove Obstacle\n");
 		}
 		ImGui::End();
 	}
