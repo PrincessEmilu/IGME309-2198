@@ -44,6 +44,10 @@ public:
 	OUTPUT: ---
 	*/
 	void AddEntity(String a_sFileName, String a_sUniqueID = "NA");
+
+	// Adds an existing entity to the entity manager
+	void AddExistingEntity(MyEntity* existingEntity);
+
 	/*
 	USAGE: Deletes the MyEntity Specified by unique ID and removes it from the list
 	ARGUMENTS: uint a_uIndex -> index of the queried entry, if < 0 asks for the last one added

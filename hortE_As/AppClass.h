@@ -12,6 +12,7 @@ Date: 2017/06
 
 #include "MyEntityManager.h"
 #include "BlockGrid.h"
+#include "Zombie.h"
 
 namespace Simplex
 {
@@ -38,10 +39,8 @@ private:
 	UIntPair m_uEndBlockCoords; // The end block x/y pair
 	UIntPair m_uPreviousStartCoords; // The last start block
 	UIntPair m_uPreviousEndCoords; // The previous start block
-	std::vector<vector3> m_vPathPositions; // The positions of the last-calculated A* path
 
-	int m_iNextZombiePositionIndex;
-	void MoveZombie();
+	Zombie* m_pZombie; // The Zombie / Path follower
 
 	bool m_bFocused = true; //is the window focused?
 
@@ -325,8 +324,16 @@ private:
 #pragma endregion
 
 #pragma region A Star Project
+	// Adds a new obstacle to the grid
 	void AddObstacle();
+
+	// Removes an obstacle from the grid
 	void RemoveObstacle();
+
+	// Handles AStart
+	void HandleAStar();
+
+
 #pragma endregion
 
 #pragma region The Rule of Three
